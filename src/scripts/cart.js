@@ -25,16 +25,38 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = document.querySelector('h1')?.textContent || 'Coffee';
         const priceElement = document.getElementById('total-price') || document.querySelector('[data-price]');
         const rawPrice = priceElement ? parseFloat(priceElement.textContent || priceElement.dataset.price) : 0;
-        const price = isNaN(rawPrice) ? 0 : rawPrice / parseInt(formData.get('quantity') || '1'); // Get unit price and ensure it's a valid number
+        const quantity = parseInt(formData.get('quantity') || '1');
+        const price = isNaN(rawPrice) ? 0 : rawPrice / quantity; // Get unit price
         const image = document.getElementById('main-image')?.src || 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg';
+        const size = formData.get('size') || '12oz';
+        const grind = formData.get('grind') || 'whole-bean';
+        
+        // Try to get variant info from the page if available
+        let variantId = null;
+        let stripePriceId = null;
+        
+        // Check if there's variant data available in the page
+        if (window.variants && window.variants.length > 0) {
+          const matchingVariant = window.variants.find(v => 
+            v.size === size && v.grind === grind
+          ) || window.variants.find(v => v.size === size) || window.variants[0];
+          
+          if (matchingVariant) {
+            variantId = matchingVariant.id;
+            stripePriceId = matchingVariant.stripe_price_id;
+          }
+        }
         
         productData = {
           productId,
+          variantId,
           title,
-          price: isNaN(price) ? 0 : price, // Ensure price is always a valid number
+          price: isNaN(price) ? 0 : price,
           image,
-          grind: formData.get('grind') || 'whole-bean',
-          quantity: parseInt(formData.get('quantity') || '1')
+          grind,
+          size,
+          quantity,
+          stripePriceId
         };
       } else {
         // We're on shop page or product card
@@ -65,21 +87,25 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
         
-        console.log('Found price text:', priceText, 'for product:', title);
+        // Handle "From $X.XX" pricing
+        if (priceText.includes('From ')) {
+          priceText = priceText.replace('From ', '');
+        }
         
         const rawPrice = parseFloat(priceText.replace('$', ''));
-        const price = isNaN(rawPrice) ? 0 : rawPrice; // Ensure price is always a valid number
+        const price = isNaN(rawPrice) ? 0 : rawPrice;
         const image = card?.querySelector('img')?.src || 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg';
-        
-        console.log('Parsed price:', price, 'from text:', priceText);
         
         productData = {
           productId,
+          variantId: null,
           title,
           price,
           image,
           grind: 'whole-bean',
-          quantity: 1
+          size: '12oz',
+          quantity: 1,
+          stripePriceId: null
         };
       }
       
@@ -90,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateCartCount();
       
       // Show success message
-      showAddToCartMessage(productData.quantity);
+      showAddToCartMessage(productData.quantity, productData.size, productData.grind);
       
       // Add visual feedback to button
       const originalText = button.textContent;
@@ -108,9 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       let cart = JSON.parse(localStorage.getItem('javamate-cart') || '[]');
       
-      // Check if item with same product and grind already exists
+      // Check if item with same product, size, and grind already exists
       const existingItem = cart.find(item => 
-        item.productId === productData.productId && item.grind === productData.grind
+        item.productId === productData.productId && 
+        item.grind === productData.grind &&
+        item.size === productData.size
       );
       
       if (existingItem) {
@@ -143,14 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  function showAddToCartMessage(quantity) {
+  function showAddToCartMessage(quantity, size, grind) {
+    const grindText = grind === 'whole-bean' ? 'whole bean' : grind;
     const message = document.createElement('div');
     message.innerHTML = `
       <div class="flex items-center">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        Added ${quantity} item${quantity > 1 ? 's' : ''} to cart!
+        Added ${quantity} ${size} ${grindText} to cart!
       </div>
     `;
     message.className = 'fixed top-24 right-8 bg-success-500 text-white py-3 px-6 rounded-lg shadow-lg z-50 animate-fade-in';

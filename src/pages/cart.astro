@@ -203,23 +203,25 @@ import Layout from '../layouts/Layout.astro';
       }
     }
     
-    addItem(productId, title, price, image, grind = 'whole-bean', quantity = 1) {
+    addItem(productId, title, price, image, grind = 'whole-bean', size = '12oz', quantity = 1, variantId = null, stripePriceId = null) {
       const existingItem = this.cart.find(item => 
-        item.productId === productId && item.grind === grind
+        item.productId === productId && item.grind === grind && item.size === size
       );
       
       if (existingItem) {
         existingItem.quantity += quantity;
       } else {
-        console.log('adding item of price', price);
         this.cart.push({
           id: Date.now().toString(),
           productId,
+          variantId,
           title,
           price: parseFloat(price),
           image,
           grind,
-          quantity
+          size,
+          quantity,
+          stripePriceId
         });
       }
       
@@ -297,7 +299,7 @@ import Layout from '../layouts/Layout.astro';
                   <div class="mb-4 sm:mb-0">
                     <h3 class="text-lg font-semibold mb-2">${item.title}</h3>
                     <p class="text-sm text-primary-600 mb-1">
-                      Grind: ${this.formatGrindType(item.grind)}
+                      Size: ${item.size || '12oz'} | Grind: ${this.formatGrindType(item.grind)}
                     </p>
                     <p class="text-lg font-semibold text-primary-900">$${item.price?.toFixed(2)} each</p>
                   </div>
@@ -435,8 +437,6 @@ import Layout from '../layouts/Layout.astro';
             this.clearCart();
           }
         });
-      } else {
-        console.log('No clear-cart button found');
       }
       
       // Promo code
@@ -460,9 +460,6 @@ import Layout from '../layouts/Layout.astro';
             promoMessage.textContent = promo.message;
             promoMessage.className = 'mt-2 text-sm text-success-600';
             promoMessage.classList.remove('hidden');
-            
-            // In a real app, you'd apply the discount to the cart
-            // For demo purposes, we just show the message
           } else {
             promoMessage.textContent = 'Invalid promo code';
             promoMessage.className = 'mt-2 text-sm text-error-600';
@@ -505,12 +502,64 @@ import Layout from '../layouts/Layout.astro';
       checkoutLoading.classList.remove('hidden');
 
       try {
-        // For now, we'll use the Organic Peru SWP Decaf product
-        // In a real implementation, you'd create line items for each cart item
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError || !session) {
           throw new Error('Authentication required');
+        }
+
+        // Create line items from cart
+        const lineItems = this.cart.map(item => ({
+          variant_data: {
+            variant_id: item.variantId || `${item.productId}-${item.size}-${item.grind}`,
+            product_name: item.title,
+            size: item.size || '12oz',
+            grind: item.grind || 'whole-bean',
+            price: item.price,
+            quantity: item.quantity
+          },
+          price_id: item.stripePriceId || null,
+          quantity: item.quantity
+        }));
+
+        // If we have multiple items, we need to handle them differently
+        // For now, we'll create a single checkout session with the first item
+        // In a real implementation, you might want to create a single product with all items
+        // or handle multiple line items differently
+        
+        const checkoutData = {
+          line_items: lineItems,
+          mode: 'payment',
+          success_url: `${window.location.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${window.location.origin}/cart`,
+        };
+
+        // If there's only one item and it has a price_id, use the simple approach
+        if (lineItems.length === 1 && lineItems[0].price_id) {
+          checkoutData.price_id = lineItems[0].price_id;
+          checkoutData.variant_data = lineItems[0].variant_data;
+          delete checkoutData.line_items;
+        } else if (lineItems.length === 1) {
+          // Single item without price_id
+          checkoutData.variant_data = lineItems[0].variant_data;
+          delete checkoutData.line_items;
+        } else {
+          // Multiple items - create a combined product
+          const totalAmount = this.getSubtotal();
+          const itemDescriptions = this.cart.map(item => 
+            `${item.quantity}x ${item.title} (${item.size} ${item.grind === 'whole-bean' ? 'Whole Bean' : item.grind})`
+          ).join(', ');
+
+          checkoutData.variant_data = {
+            variant_id: `cart-${Date.now()}`,
+            product_name: `Coffee Order - ${this.cart.length} items`,
+            size: 'Mixed',
+            grind: 'Mixed',
+            price: totalAmount,
+            quantity: 1,
+            description: itemDescriptions
+          };
+          delete checkoutData.line_items;
         }
 
         const response = await fetch(`${supabaseUrl}/functions/v1/stripe-checkout`, {
@@ -519,12 +568,7 @@ import Layout from '../layouts/Layout.astro';
             'Authorization': `Bearer ${session.access_token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            price_id: 'price_1RKgo2R1hBQXgqR7RYvtL02O', // Organic Peru SWP Decaf
-            mode: 'payment',
-            success_url: `${window.location.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${window.location.origin}/cart`,
-          }),
+          body: JSON.stringify(checkoutData),
         });
 
         const data = await response.json();
@@ -585,9 +629,9 @@ import Layout from '../layouts/Layout.astro';
   });
   
   // Global function to add items to cart (called from other pages)
-  window.addToCart = function(productId, title, price, image, grind = 'whole-bean', quantity = 1) {
+  window.addToCart = function(productId, title, price, image, grind = 'whole-bean', size = '12oz', quantity = 1, variantId = null, stripePriceId = null) {
     if (window.cartManager) {
-      window.cartManager.addItem(productId, title, price, image, grind, quantity);
+      window.cartManager.addItem(productId, title, price, image, grind, size, quantity, variantId, stripePriceId);
     }
   };
 </script>
