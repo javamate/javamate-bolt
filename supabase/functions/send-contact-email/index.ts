@@ -168,7 +168,7 @@ ${formData.message}
       },
       to: [
         {
-          email: "info@javamate.net",
+          email: "eric@javamate.net",
           name: "Javamate Coffee Team"
         }
       ],
