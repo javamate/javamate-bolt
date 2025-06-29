@@ -1,0 +1,68 @@
+---
+const { products = [] } = Astro.props;
+---
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 reveal">
+  {products.map((product) => (
+    <div class="card group">
+      <div class="relative overflow-hidden">
+        <img 
+          src={product.fields.featuredImage?.fields.file.url || "https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg"} 
+          alt={product.fields.title} 
+          class="w-full aspect-square object-cover transform group-hover:scale-105 transition-transform duration-500"
+        />
+        {product.fields.isNew && (
+          <div class="absolute top-4 left-4 bg-accent-500 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+            New
+          </div>
+        )}
+      </div>
+      <div class="p-6">
+        <h3 class="text-xl mb-2">{product.fields.title}</h3>
+        <p class="text-primary-700 mb-2 line-clamp-2">{product.fields.shortDescription}</p>
+        <div class="flex items-center justify-between mt-4">
+          <span class="text-lg font-semibold">${product.fields.price.toFixed(2)}</span>
+          <a href={`/product/${product.fields.slug}`} class="btn-primary py-2 px-4">View</a>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+<!-- Fallback in case no products are available -->
+{products.length === 0 && (
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 reveal">
+    {Array.from({ length: 4 }).map((_, i) => (
+      <div class="card group">
+        <div class="relative overflow-hidden">
+          <img 
+            src={`https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=format&w=800&h=800`} 
+            alt="Coffee beans" 
+            class="w-full aspect-square object-cover transform group-hover:scale-105 transition-transform duration-500"
+          />
+          {i === 0 && (
+            <div class="absolute top-4 left-4 bg-accent-500 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+              New
+            </div>
+          )}
+        </div>
+        <div class="p-6">
+          <h3 class="text-xl mb-2">
+            {i === 0 ? "Ethiopian Yirgacheffe" : 
+             i === 1 ? "Colombian Supremo" :
+             i === 2 ? "Guatemala Antigua" : "Sumatra Mandheling"}
+          </h3>
+          <p class="text-primary-700 mb-2 line-clamp-2">
+            {i === 0 ? "Bright and fruity with notes of bergamot and lemon." : 
+             i === 1 ? "Sweet and balanced with notes of caramel and chocolate." :
+             i === 2 ? "Rich and complex with notes of cocoa and spice." : "Bold and earthy with notes of cedar and herbs."}
+          </p>
+          <div class="flex items-center justify-between mt-4">
+            <span class="text-lg font-semibold">${(14.99 + i).toFixed(2)}</span>
+            <a href="/shop" class="btn-primary py-2 px-4">View</a>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+)}

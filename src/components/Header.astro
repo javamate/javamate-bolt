@@ -1,0 +1,182 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<header class="sticky top-0 z-50 w-full transition-all duration-300" id="site-header">
+  <div class="container-custom py-4 flex items-center justify-between">
+    <a href="/" class="flex items-center space-x-2">
+      <img src="/images/logo.svg" alt="Javamate Coffee Roasters" width="40" height="40" class="w-10 h-10" />
+      <span class="font-serif font-bold text-xl text-primary-900">Javamate</span>
+    </a>
+    
+    <nav class="hidden md:flex space-x-8">
+      <a href="/" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">Home</a>
+      <a href="/shop" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">Shop</a>
+      <a href="/about" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">About</a>
+      <a href="/contact" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">Contact</a>
+    </nav>
+    
+    <div class="flex items-center space-x-4">
+      <!-- Auth buttons (will be populated by JavaScript) -->
+      <div id="auth-buttons" class="hidden md:flex items-center space-x-4">
+        <!-- Populated by JavaScript -->
+      </div>
+      
+      <a href="/cart" class="relative text-primary-800 hover:text-primary-600 transition-colors">
+        <span class="sr-only">Shopping Cart</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        <span id="cart-count" class="absolute -top-2 -right-2 bg-accent-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+      </a>
+      
+      <button id="mobile-menu-toggle" class="md:hidden text-primary-800 hover:text-primary-600 transition-colors">
+        <span class="sr-only">Menu</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="fixed inset-0 bg-white z-50 flex flex-col p-6 transform translate-x-full transition-transform duration-300 md:hidden">
+    <div class="flex justify-between items-center mb-8">
+      <a href="/" class="flex items-center space-x-2">
+        <img src="/images/logo.svg" alt="Javamate Coffee Roasters" width="40" height="40" class="w-10 h-10" />
+        <span class="font-serif font-bold text-xl text-primary-900">Javamate</span>
+      </a>
+      <button id="mobile-menu-close" class="text-primary-800 hover:text-primary-600 transition-colors">
+        <span class="sr-only">Close Menu</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+    <nav class="flex flex-col space-y-6 text-lg">
+      <a href="/" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">Home</a>
+      <a href="/shop" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">Shop</a>
+      <a href="/about" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">About</a>
+      <a href="/contact" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">Contact</a>
+      
+      <!-- Mobile auth buttons -->
+      <div id="mobile-auth-buttons" class="pt-4 border-t border-primary-200">
+        <!-- Populated by JavaScript -->
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Header scroll behavior
+    const header = document.getElementById('site-header');
+    let lastScrollY = window.scrollY;
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        header.classList.add('bg-white', 'shadow-sm');
+      } else {
+        header.classList.remove('bg-white', 'shadow-sm');
+      }
+      
+      // Hide on scroll down, show on scroll up
+      if (window.scrollY > lastScrollY) {
+        header.classList.add('-translate-y-full');
+      } else {
+        header.classList.remove('-translate-y-full');
+      }
+      
+      lastScrollY = window.scrollY;
+    });
+    
+    // Mobile menu toggle
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    mobileMenuToggle.addEventListener('click', () => {
+      mobileMenu.classList.remove('translate-x-full');
+      document.body.classList.add('overflow-hidden');
+    });
+    
+    mobileMenuClose.addEventListener('click', () => {
+      mobileMenu.classList.add('translate-x-full');
+      document.body.classList.remove('overflow-hidden');
+    });
+
+    // Auth state management
+    await updateAuthButtons();
+
+    // Listen for auth state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+      updateAuthButtons();
+    });
+
+    async function updateAuthButtons() {
+      const authButtons = document.getElementById('auth-buttons');
+      const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
+      
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error || !user) {
+          // User not logged in
+          const loginButtons = `
+            <a href="/login" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">Sign In</a>
+            <a href="/signup" class="btn-primary py-2 px-4">Sign Up</a>
+          `;
+          const mobileLoginButtons = `
+            <a href="/login" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">Sign In</a>
+            <a href="/signup" class="btn-primary py-2 px-4 text-center">Sign Up</a>
+          `;
+          
+          authButtons.innerHTML = loginButtons;
+          mobileAuthButtons.innerHTML = mobileLoginButtons;
+        } else {
+          // User logged in
+          const userButtons = `
+            <a href="/dashboard" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">Dashboard</a>
+            <button id="logout-btn" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">Sign Out</button>
+          `;
+          const mobileUserButtons = `
+            <a href="/dashboard" class="font-medium text-primary-800 hover:text-primary-600 transition-colors">Dashboard</a>
+            <button id="mobile-logout-btn" class="font-medium text-primary-800 hover:text-primary-600 transition-colors text-left">Sign Out</button>
+          `;
+          
+          authButtons.innerHTML = userButtons;
+          mobileAuthButtons.innerHTML = mobileUserButtons;
+          
+          // Add logout handlers
+          const logoutBtn = document.getElementById('logout-btn');
+          const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+          
+          if (logoutBtn) {
+            logoutBtn.addEventListener('click', handleLogout);
+          }
+          if (mobileLogoutBtn) {
+            mobileLogoutBtn.addEventListener('click', handleLogout);
+          }
+        }
+      } catch (error) {
+        console.error('Error updating auth buttons:', error);
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await supabase.auth.signOut();
+        window.location.href = '/';
+      } catch (error) {
+        console.error('Error signing out:', error);
+      }
+    }
+  });
+</script>

@@ -1,0 +1,209 @@
+---
+---
+
+<form class="space-y-6" id="contact-form">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="form-group">
+      <label for="name" class="form-label">Full Name *</label>
+      <input 
+        type="text" 
+        id="name" 
+        name="name" 
+        class="form-input" 
+        required 
+      />
+    </div>
+    
+    <div class="form-group">
+      <label for="email" class="form-label">Email Address *</label>
+      <input 
+        type="email" 
+        id="email" 
+        name="email" 
+        class="form-input" 
+        required 
+      />
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <label for="phone" class="form-label">Phone Number (Optional)</label>
+    <input 
+      type="tel" 
+      id="phone" 
+      name="phone" 
+      class="form-input" 
+    />
+  </div>
+  
+  <div class="form-group">
+    <label class="form-label">Preferred Roast Level *</label>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2">
+      <div class="flex items-center">
+        <input 
+          type="radio" 
+          id="light-roast" 
+          name="roast_level" 
+          value="light" 
+          class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300" 
+          required
+        />
+        <label for="light-roast" class="ml-2 block text-primary-700">Light</label>
+      </div>
+      
+      <div class="flex items-center">
+        <input 
+          type="radio" 
+          id="medium-roast" 
+          name="roast_level" 
+          value="medium"
+          class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+        />
+        <label for="medium-roast" class="ml-2 block text-primary-700">Medium</label>
+      </div>
+      
+      <div class="flex items-center">
+        <input 
+          type="radio" 
+          id="dark-roast" 
+          name="roast_level" 
+          value="dark"
+          class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+        />
+        <label for="dark-roast" class="ml-2 block text-primary-700">Dark</label>
+      </div>
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <label class="form-label">Preferred Designations (Select all that apply)</label>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+      <div class="flex items-center">
+        <input 
+          type="checkbox" 
+          id="organic" 
+          name="designations" 
+          value="organic"
+          class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+        />
+        <label for="organic" class="ml-2 block text-primary-700">Organic</label>
+      </div>
+      
+      <div class="flex items-center">
+        <input 
+          type="checkbox" 
+          id="fair-trade" 
+          name="designations" 
+          value="fair-trade"
+          class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+        />
+        <label for="fair-trade" class="ml-2 block text-primary-700">Fair Trade</label>
+      </div>
+      
+      <div class="flex items-center">
+        <input 
+          type="checkbox" 
+          id="decaf" 
+          name="designations" 
+          value="decaf"
+          class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+        />
+        <label for="decaf" class="ml-2 block text-primary-700">Decaf</label>
+      </div>
+      
+      <div class="flex items-center">
+        <input 
+          type="checkbox" 
+          id="bird-friendly" 
+          name="designations" 
+          value="bird-friendly"
+          class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+        />
+        <label for="bird-friendly" class="ml-2 block text-primary-700">Bird-Friendly</label>
+      </div>
+      
+      <div class="flex items-center">
+        <input 
+          type="checkbox" 
+          id="shade-grown" 
+          name="designations" 
+          value="shade-grown"
+          class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+        />
+        <label for="shade-grown" class="ml-2 block text-primary-700">Shade Grown</label>
+      </div>
+      
+      <div class="flex items-center">
+        <input 
+          type="checkbox" 
+          id="direct-trade" 
+          name="designations" 
+          value="direct-trade"
+          class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+        />
+        <label for="direct-trade" class="ml-2 block text-primary-700">Direct Trade</label>
+      </div>
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <label for="message" class="form-label">Message *</label>
+    <textarea 
+      id="message" 
+      name="message" 
+      rows="5" 
+      class="form-input" 
+      required
+    ></textarea>
+  </div>
+  
+  <div class="flex items-start">
+    <div class="flex items-center h-5">
+      <input
+        id="newsletter"
+        name="newsletter"
+        type="checkbox"
+        class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+      />
+    </div>
+    <div class="ml-3 text-sm">
+      <label for="newsletter" class="text-primary-700">Subscribe to our newsletter for updates and special offers</label>
+    </div>
+  </div>
+  
+  <div class="flex justify-end">
+    <button type="submit" class="btn-primary">Send Message</button>
+  </div>
+  
+  <div id="form-success" class="hidden p-4 bg-success-100 text-success-700 rounded-md">
+    Thank you for contacting us! We'll get back to you shortly.
+  </div>
+  
+  <div id="form-error" class="hidden p-4 bg-error-100 text-error-700 rounded-md">
+    There was an error submitting your message. Please try again.
+  </div>
+</form>
+
+<script>
+  const form = document.getElementById('contact-form');
+  const successMessage = document.getElementById('form-success');
+  const errorMessage = document.getElementById('form-error');
+  
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    // In a real implementation, you would send the form data to your server
+    // For demonstration purposes, we'll just show the success message
+    
+    successMessage.classList.remove('hidden');
+    form.reset();
+    
+    // Scroll to the success message
+    successMessage.scrollIntoView({ behavior: 'smooth' });
+    
+    // Hide the success message after 5 seconds
+    setTimeout(() => {
+      successMessage.classList.add('hidden');
+    }, 5000);
+  });
+</script>

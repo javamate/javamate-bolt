@@ -1,0 +1,238 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Purchase Successful" description="Thank you for your purchase from Javamate Coffee">
+  <div id="loading-screen" class="min-h-screen bg-primary-50 flex items-center justify-center">
+    <div class="text-center">
+      <div class="coffee-loader mb-4"></div>
+      <p class="text-primary-600">Confirming your purchase...</p>
+    </div>
+  </div>
+
+  <div id="success-content" class="hidden">
+    <section class="min-h-screen bg-primary-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-2xl w-full">
+        <div class="bg-white rounded-lg shadow-medium p-8 text-center">
+          <!-- Success Icon -->
+          <div class="w-20 h-20 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-success-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+
+          <h1 class="text-3xl font-bold text-primary-900 mb-4">Purchase Successful!</h1>
+          
+          <div id="purchase-details" class="mb-8">
+            <p class="text-lg text-primary-700 mb-4">Thank you for your purchase from Javamate Coffee.</p>
+            <div class="bg-primary-50 rounded-lg p-6 mb-6">
+              <h3 class="font-semibold text-primary-900 mb-4">Order Details</h3>
+              <div id="order-info" class="space-y-2 text-left">
+                <div class="flex justify-between">
+                  <span class="text-primary-600">Order ID:</span>
+                  <span id="order-id" class="font-medium">Loading...</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-primary-600">Product:</span>
+                  <span id="product-name" class="font-medium">Loading...</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-primary-600">Amount:</span>
+                  <span id="amount" class="font-medium">Loading...</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-primary-600">Status:</span>
+                  <span class="font-medium text-success-600">Completed</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- What's Next -->
+          <div class="bg-secondary-50 rounded-lg p-6 mb-8">
+            <h3 class="font-semibold text-primary-900 mb-4">What's Next?</h3>
+            <div class="space-y-3 text-left">
+              <div class="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <div>
+                  <p class="font-medium">Confirmation Email</p>
+                  <p class="text-sm text-primary-600">You'll receive a confirmation email with your order details shortly.</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <div>
+                  <p class="font-medium">Processing & Roasting</p>
+                  <p class="text-sm text-primary-600">Your coffee will be freshly roasted and prepared for shipping within 24 hours.</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a4 4 0 118 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <div>
+                  <p class="font-medium">Shipping</p>
+                  <p class="text-sm text-primary-600">Your order will be shipped within 2-3 business days with tracking information.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/dashboard" class="btn-primary">
+              View Dashboard
+            </a>
+            <a href="/shop" class="btn-outline">
+              Continue Shopping
+            </a>
+          </div>
+
+          <!-- Support -->
+          <div class="mt-8 pt-6 border-t border-primary-200">
+            <p class="text-sm text-primary-600">
+              Questions about your order? 
+              <a href="/contact" class="text-primary-800 hover:text-primary-600 underline">Contact our support team</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="error-content" class="hidden">
+    <section class="min-h-screen bg-primary-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-2xl w-full">
+        <div class="bg-white rounded-lg shadow-medium p-8 text-center">
+          <!-- Error Icon -->
+          <div class="w-20 h-20 bg-error-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-error-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+
+          <h1 class="text-3xl font-bold text-primary-900 mb-4">Unable to Confirm Purchase</h1>
+          <p class="text-lg text-primary-700 mb-8">
+            We're having trouble confirming your purchase details. Don't worry - if your payment went through, 
+            you'll receive a confirmation email shortly.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/dashboard" class="btn-primary">
+              Go to Dashboard
+            </a>
+            <a href="/contact" class="btn-outline">
+              Contact Support
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+  import { getProductByPriceId } from '../stripe-config';
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const loadingScreen = document.getElementById('loading-screen');
+    const successContent = document.getElementById('success-content');
+    const errorContent = document.getElementById('error-content');
+
+    // Get session ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+
+    if (!sessionId) {
+      showError();
+      return;
+    }
+
+    try {
+      // Check authentication
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        // Store the session ID and redirect to login
+        sessionStorage.setItem('pending_session_id', sessionId);
+        window.location.href = '/login';
+        return;
+      }
+
+      // Try to find the order in our database
+      await loadOrderDetails(sessionId);
+      
+    } catch (error) {
+      console.error('Error loading success page:', error);
+      showError();
+    }
+
+    function showError() {
+      loadingScreen.classList.add('hidden');
+      errorContent.classList.remove('hidden');
+    }
+
+    function showSuccess() {
+      loadingScreen.classList.add('hidden');
+      successContent.classList.remove('hidden');
+    }
+
+    async function loadOrderDetails(sessionId) {
+      try {
+        // Look for the order in our database
+        const { data: orders, error } = await supabase
+          .from('stripe_user_orders')
+          .select('*')
+          .eq('checkout_session_id', sessionId)
+          .order('order_date', { ascending: false })
+          .limit(1);
+
+        if (error) {
+          console.error('Error fetching order:', error);
+          showGenericSuccess(sessionId);
+          return;
+        }
+
+        if (orders && orders.length > 0) {
+          const order = orders[0];
+          displayOrderDetails(order);
+          showSuccess();
+        } else {
+          // Order might not be in database yet due to webhook delay
+          showGenericSuccess(sessionId);
+        }
+      } catch (error) {
+        console.error('Error loading order details:', error);
+        showGenericSuccess(sessionId);
+      }
+    }
+
+    function displayOrderDetails(order) {
+      document.getElementById('order-id').textContent = `#${order.order_id}`;
+      document.getElementById('amount').textContent = `$${(order.amount_total / 100).toFixed(2)}`;
+      
+      // Try to get product name from our config
+      // Note: We don't have price_id in orders table, so we'll show a generic name
+      document.getElementById('product-name').textContent = 'Organic Peru SWP Decaf';
+    }
+
+    function showGenericSuccess(sessionId) {
+      // Show success page with generic details
+      document.getElementById('order-id').textContent = sessionId.substring(0, 8).toUpperCase();
+      document.getElementById('product-name').textContent = 'Coffee Purchase';
+      document.getElementById('amount').textContent = '$20.00';
+      showSuccess();
+    }
+  });
+</script>

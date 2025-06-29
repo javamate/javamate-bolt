@@ -1,0 +1,53 @@
+---
+const testimonials = [
+  {
+    quote: "The Ethiopian Yirgacheffe is out of this world! The bright, fruity flavors make it my favorite morning coffee.",
+    author: "Sarah M.",
+    location: "Portland, OR"
+  },
+  {
+    quote: "I've tried countless coffee subscriptions, but Javamate consistently delivers the best beans I've ever had.",
+    author: "Michael T.",
+    location: "Chicago, IL"
+  },
+  {
+    quote: "Not only is the coffee exceptional, but I love knowing it's ethically sourced. Makes each cup that much better.",
+    author: "Amara K.",
+    location: "Austin, TX"
+  }
+];
+---
+
+<section class="section bg-primary-900 text-white">
+  <div class="container-custom">
+    <div class="max-w-3xl mx-auto text-center mb-12 reveal">
+      <h2 class="mb-4">What Our Customers Say</h2>
+      <p class="text-lg text-primary-100">
+        Don't just take our word for it. Here's what coffee lovers have to say about Javamate.
+      </p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 reveal">
+      {testimonials.map((testimonial, index) => (
+        <div class="bg-primary-800 p-8 rounded-lg relative">
+          <!-- Quote icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-primary-500 absolute -top-4 -left-4 opacity-30" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13 14.725c0-5.141 3.892-10.519 10-11.725l.984 2.126c-2.215.835-4.163 3.742-4.38 5.746 2.491.392 4.396 2.547 4.396 5.149 0 3.182-2.584 4.979-5.199 4.979-3.015 0-5.801-2.305-5.801-6.275zm-13 0c0-5.141 3.892-10.519 10-11.725l.984 2.126c-2.215.835-4.163 3.742-4.38 5.746 2.491.392 4.396 2.547 4.396 5.149 0 3.182-2.584 4.979-5.199 4.979-3.015 0-5.801-2.305-5.801-6.275z" />
+          </svg>
+          
+          <p class="mb-6 text-primary-100 relative z-10">{testimonial.quote}</p>
+          
+          <div class="flex items-center">
+            <div class="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center mr-3">
+              <span class="text-white font-semibold">{testimonial.author.charAt(0)}</span>
+            </div>
+            <div>
+              <h4 class="font-semibold">{testimonial.author}</h4>
+              <p class="text-sm text-primary-300">{testimonial.location}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
