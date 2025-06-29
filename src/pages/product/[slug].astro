@@ -1,13 +1,12 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getContentfulEntry, getContentfulEntries } from '../../lib/contentful';
+import { getCrystallizeProduct, getCrystallizeProducts } from '../../lib/crystallize';
 
 export const prerender = true;
 
 export async function getStaticPaths() {
   try {
-    const products = await getContentfulEntries('product');
-    console.log('Got products', products);
+    const products = await getCrystallizeProducts();
     
     return products.map((product) => ({
       params: { slug: product.fields.slug },
@@ -22,17 +21,21 @@ export async function getStaticPaths() {
 const { product } = Astro.props;
 
 if (!product) {
-  console.log('product', product)
   return Astro.redirect('/404');
 }
 
 // Get related products (same origin or roast level)
-const relatedProducts = await getContentfulEntries('product', {
-  limit: 4,
-  'sys.id[ne]': product.sys.id,
-});
+const allProducts = await getCrystallizeProducts({ limit: 20 });
+const relatedProducts = allProducts
+  .filter(p => p.sys.id !== product.sys.id)
+  .slice(0, 4);
 
 const productImages = product.fields.images || [product.fields.featuredImage].filter(Boolean);
+const variants = product.fields.variants || [];
+
+// Get unique sizes and grinds for the variant selector
+const sizes = [...new Set(variants.map(v => v.size))];
+const grinds = [...new Set(variants.map(v => v.grind))];
 ---
 
 <Layout 
@@ -103,14 +106,27 @@ const productImages = product.fields.images || [product.fields.featuredImage].fi
           <h1 class="mb-4">{product.fields.title}</h1>
           
           <div class="mb-6">
-            <span class="text-3xl font-bold text-primary-900">${product.fields.price.toFixed(2)}</span>
-            <span class="text-primary-600 ml-2">per 12oz bag</span>
+            <span class="text-3xl font-bold text-primary-900" id="variant-price">
+              ${variants.length > 0 ? Math.min(...variants.map(v => v.price)).toFixed(2) : product.fields.price.toFixed(2)}
+            </span>
+            <span class="text-primary-600 ml-2" id="variant-size">per bag</span>
           </div>
 
           <p class="text-lg text-primary-800 mb-8">{product.fields.shortDescription}</p>
 
           <!-- Add to Cart Form -->
-          <form class="mb-8 space-y-4">
+          <form class="mb-8 space-y-4" id="product-form">
+            {sizes.length > 1 && (
+              <div>
+                <label for="size-select" class="form-label">Size</label>
+                <select id="size-select" name="size" class="form-input">
+                  {sizes.map(size => (
+                    <option value={size}>{size}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div>
               <label for="grind-type" class="form-label">Grind Type</label>
               <select id="grind-type" name="grind" class="form-input">
@@ -151,7 +167,7 @@ const productImages = product.fields.images || [product.fields.featuredImage].fi
             </div>
 
             <button type="submit" class="btn-primary w-full py-4 text-lg add-to-cart" data-product-id={product.sys.id}>
-              Add to Cart - $<span id="total-price">{product.fields.price.toFixed(2)}</span>
+              Add to Cart - $<span id="total-price">{variants.length > 0 ? Math.min(...variants.map(v => v.price)).toFixed(2) : product.fields.price.toFixed(2)}</span>
             </button>
           </form>
 
@@ -247,7 +263,9 @@ const productImages = product.fields.images || [product.fields.featuredImage].fi
                   <h3 class="text-xl mb-2">{relatedProduct.fields.title}</h3>
                   <p class="text-primary-700 mb-4 line-clamp-2">{relatedProduct.fields.shortDescription}</p>
                   <div class="flex items-center justify-between">
-                    <span class="text-lg font-semibold">${relatedProduct.fields.price.toFixed(2)}</span>
+                    <span class="text-lg font-semibold">
+                      From ${Math.min(...relatedProduct.fields.variants.map(v => v.price)).toFixed(2)}
+                    </span>
                     <a href={`/product/${relatedProduct.fields.slug}`} class="btn-primary py-2 px-4">View</a>
                   </div>
                 </div>
@@ -260,7 +278,7 @@ const productImages = product.fields.images || [product.fields.featuredImage].fi
   </section>
 </Layout>
 
-<script>
+<script define:vars={{ variants }}>
   document.addEventListener('DOMContentLoaded', () => {
     // Image gallery functionality
     const mainImage = document.getElementById('main-image');
@@ -279,53 +297,95 @@ const productImages = product.fields.images || [product.fields.featuredImage].fi
       });
     });
     
-    // Quantity controls
+    // Variant selection and pricing
+    const sizeSelect = document.getElementById('size-select');
+    const grindSelect = document.getElementById('grind-type');
     const quantityInput = document.getElementById('quantity');
     const decreaseBtn = document.getElementById('decrease-qty');
     const increaseBtn = document.getElementById('increase-qty');
+    const variantPrice = document.getElementById('variant-price');
+    const variantSize = document.getElementById('variant-size');
     const totalPriceSpan = document.getElementById('total-price');
     
-    if (quantityInput && totalPriceSpan) {
-      const basePrice = parseFloat(totalPriceSpan.textContent);
+    let currentVariant = variants[0] || { price: 0, size: '12oz' };
+    
+    function updateVariant() {
+      const selectedSize = sizeSelect ? sizeSelect.value : '12oz';
+      const selectedGrind = grindSelect ? grindSelect.value : 'whole-bean';
       
-      function updateTotalPrice() {
-        const quantity = parseInt(quantityInput.value);
-        const total = (basePrice * quantity).toFixed(2);
-        totalPriceSpan.textContent = total;
+      // Find matching variant
+      const matchingVariant = variants.find(v => 
+        v.size === selectedSize && v.grind === selectedGrind
+      ) || variants.find(v => v.size === selectedSize) || variants[0];
+      
+      if (matchingVariant) {
+        currentVariant = matchingVariant;
+        variantPrice.textContent = `$${matchingVariant.price.toFixed(2)}`;
+        variantSize.textContent = `per ${matchingVariant.size} bag`;
+        updateTotalPrice();
       }
-      
-      if (decreaseBtn) {
-        decreaseBtn.addEventListener('click', () => {
-          const currentValue = parseInt(quantityInput.value);
-          if (currentValue > 1) {
-            quantityInput.value = currentValue - 1;
-            updateTotalPrice();
-          }
-        });
-      }
-      
-      if (increaseBtn) {
-        increaseBtn.addEventListener('click', () => {
-          const currentValue = parseInt(quantityInput.value);
-          if (currentValue < 10) {
-            quantityInput.value = currentValue + 1;
-            updateTotalPrice();
-          }
-        });
-      }
-      
+    }
+    
+    function updateTotalPrice() {
+      const quantity = parseInt(quantityInput.value) || 1;
+      const total = (currentVariant.price * quantity).toFixed(2);
+      totalPriceSpan.textContent = total;
+    }
+    
+    // Event listeners
+    if (sizeSelect) {
+      sizeSelect.addEventListener('change', updateVariant);
+    }
+    
+    if (grindSelect) {
+      grindSelect.addEventListener('change', updateVariant);
+    }
+    
+    if (decreaseBtn) {
+      decreaseBtn.addEventListener('click', () => {
+        const currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+          quantityInput.value = currentValue - 1;
+          updateTotalPrice();
+        }
+      });
+    }
+    
+    if (increaseBtn) {
+      increaseBtn.addEventListener('click', () => {
+        const currentValue = parseInt(quantityInput.value);
+        if (currentValue < 10) {
+          quantityInput.value = currentValue + 1;
+          updateTotalPrice();
+        }
+      });
+    }
+    
+    if (quantityInput) {
       quantityInput.addEventListener('change', updateTotalPrice);
     }
     
+    // Initialize
+    updateVariant();
+    
     // Add to cart form submission
-    const addToCartForm = document.querySelector('form');
+    const addToCartForm = document.getElementById('product-form');
     if (addToCartForm) {
       addToCartForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
         const formData = new FormData(addToCartForm);
         const quantity = parseInt(formData.get('quantity') || '1');
-        const grind = formData.get('grind');
+        const size = formData.get('size') || currentVariant.size;
+        const grind = formData.get('grind') || 'whole-bean';
+        
+        // Store variant info for cart
+        const variantData = {
+          ...currentVariant,
+          size,
+          grind,
+          quantity
+        };
         
         // Update cart count
         const cartCount = document.getElementById('cart-count');
@@ -343,7 +403,7 @@ const productImages = product.fields.images || [product.fields.featuredImage].fi
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
-            Added ${quantity} item${quantity > 1 ? 's' : ''} to cart!
+            Added ${quantity} ${size} ${grind === 'whole-bean' ? 'whole bean' : grind} to cart!
           </div>
         `;
         message.className = 'fixed top-24 right-8 bg-success-500 text-white py-3 px-6 rounded-lg shadow-lg z-50 animate-fade-in';

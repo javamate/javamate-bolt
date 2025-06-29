@@ -6,13 +6,11 @@ import Story from '../components/Story.astro';
 import Process from '../components/Process.astro';
 import Testimonials from '../components/Testimonials.astro';
 import Newsletter from '../components/Newsletter.astro';
-import { getContentfulEntries } from '../lib/contentful';
+import { getCrystallizeProducts } from '../lib/crystallize';
 
-// Fetch featured products from Contentful
-const featuredProducts = await getContentfulEntries('product', {
-  'fields.featured': true,
-  limit: 4,
-});
+// Fetch featured products from Crystallize
+const allProducts = await getCrystallizeProducts({ limit: 10 });
+const featuredProducts = allProducts.filter(product => product.fields.featured);
 ---
 
 <Layout title="Fresh Roasted Coffee | Javamate Coffee Roasters">
@@ -53,7 +51,7 @@ const featuredProducts = await getContentfulEntries('product', {
         <div class="card p-8 text-center">
           <div class="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m-9 9a9 9 0 019-9" />
             </svg>
           </div>
           <h3 class="text-xl mb-2">Ethically Sourced</h3>

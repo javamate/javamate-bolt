@@ -43,20 +43,46 @@ Deno.serve(async (req) => {
       return corsResponse({ error: 'Method not allowed' }, 405);
     }
 
-    const { price_id, success_url, cancel_url, mode } = await req.json();
+    const { price_id, variant_data, success_url, cancel_url, mode } = await req.json();
 
-    const error = validateParameters(
-      { price_id, success_url, cancel_url, mode },
-      {
-        cancel_url: 'string',
-        price_id: 'string',
-        success_url: 'string',
-        mode: { values: ['payment', 'subscription'] },
-      },
-    );
+    // Validate required parameters
+    if (!success_url || !cancel_url) {
+      return corsResponse({ error: 'Missing required URLs' }, 400);
+    }
 
-    if (error) {
-      return corsResponse({ error }, 400);
+    // If no price_id provided but variant_data is available, create a new price
+    let finalPriceId = price_id;
+    
+    if (!finalPriceId && variant_data) {
+      try {
+        const price = await stripe.prices.create({
+          unit_amount: Math.round(variant_data.price * 100), // Convert to cents
+          currency: 'usd',
+          product_data: {
+            name: `${variant_data.product_name} - ${variant_data.size} ${variant_data.grind === 'whole-bean' ? 'Whole Bean' : variant_data.grind}`,
+            metadata: {
+              variant_id: variant_data.variant_id,
+              size: variant_data.size,
+              grind: variant_data.grind,
+            },
+          },
+          metadata: {
+            variant_id: variant_data.variant_id,
+            size: variant_data.size,
+            grind: variant_data.grind,
+          },
+        });
+        
+        finalPriceId = price.id;
+        console.log(`Created new Stripe price ${finalPriceId} for variant ${variant_data.variant_id}`);
+      } catch (priceError) {
+        console.error('Error creating Stripe price:', priceError);
+        return corsResponse({ error: 'Failed to create price' }, 500);
+      }
+    }
+
+    if (!finalPriceId) {
+      return corsResponse({ error: 'No price ID available' }, 400);
     }
 
     const authHeader = req.headers.get('Authorization')!;
@@ -83,7 +109,6 @@ Deno.serve(async (req) => {
 
     if (getCustomerError) {
       console.error('Failed to fetch customer information from the database', getCustomerError);
-
       return corsResponse({ error: 'Failed to fetch customer information' }, 500);
     }
 
@@ -157,7 +182,6 @@ Deno.serve(async (req) => {
 
         if (getSubscriptionError) {
           console.error('Failed to fetch subscription information from the database', getSubscriptionError);
-
           return corsResponse({ error: 'Failed to fetch subscription information' }, 500);
         }
 
@@ -170,27 +194,38 @@ Deno.serve(async (req) => {
 
           if (createSubscriptionError) {
             console.error('Failed to create subscription record for existing customer', createSubscriptionError);
-
             return corsResponse({ error: 'Failed to create subscription record for existing customer' }, 500);
           }
         }
       }
     }
 
-    // create Checkout Session
-    const session = await stripe.checkout.sessions.create({
+    // Create Checkout Session
+    const sessionData: any = {
       customer: customerId,
       payment_method_types: ['card'],
       line_items: [
         {
-          price: price_id,
+          price: finalPriceId,
           quantity: 1,
         },
       ],
-      mode,
+      mode: mode || 'payment',
       success_url,
       cancel_url,
-    });
+    };
+
+    // Add metadata if variant_data is provided
+    if (variant_data) {
+      sessionData.metadata = {
+        variant_id: variant_data.variant_id,
+        product_name: variant_data.product_name,
+        size: variant_data.size,
+        grind: variant_data.grind,
+      };
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionData);
 
     console.log(`Created checkout session ${session.id} for customer ${customerId}`);
 

@@ -1,11 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getContentfulEntries } from '../lib/contentful';
+import { getCrystallizeProducts } from '../lib/crystallize';
 
-// Fetch all products from Contentful
-const products = await getContentfulEntries('product', {
-  order: '-fields.featured,-sys.createdAt',
-});
+// Fetch all products from Crystallize
+const products = await getCrystallizeProducts({ limit: 50 });
 
 // Get unique origins and roast levels for filtering
 const origins = [...new Set(products.map(p => p.fields.origin).filter(Boolean))];
@@ -90,7 +88,9 @@ const roastLevels = [...new Set(products.map(p => p.fields.roastLevel).filter(Bo
               <h3 class="text-xl mb-2 group-hover:text-primary-600 transition-colors">{product.fields.title}</h3>
               <p class="text-primary-700 mb-4 line-clamp-2">{product.fields.shortDescription}</p>
               <div class="flex items-center justify-between">
-                <span class="text-2xl font-bold text-primary-900">${product.fields.price.toFixed(2)}</span>
+                <span class="text-2xl font-bold text-primary-900">
+                  From ${Math.min(...product.fields.variants.map(v => v.price)).toFixed(2)}
+                </span>
                 <div class="flex gap-2">
                   <a href={`/product/${product.fields.slug}`} class="btn-outline py-2 px-4 text-sm">View</a>
                   <button class="btn-primary py-2 px-4 text-sm add-to-cart" data-product-id={product.sys.id}>
