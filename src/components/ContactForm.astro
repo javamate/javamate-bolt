@@ -172,38 +172,154 @@
   </div>
   
   <div class="flex justify-end">
-    <button type="submit" class="btn-primary">Send Message</button>
+    <button type="submit" class="btn-primary" id="submit-btn">
+      <span id="submit-text">Send Message</span>
+      <div id="submit-loading" class="hidden flex items-center">
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Sending...
+      </div>
+    </button>
   </div>
   
   <div id="form-success" class="hidden p-4 bg-success-100 text-success-700 rounded-md">
-    Thank you for contacting us! We'll get back to you shortly.
+    <div class="flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      Thank you for contacting us! We'll get back to you shortly.
+    </div>
   </div>
   
   <div id="form-error" class="hidden p-4 bg-error-100 text-error-700 rounded-md">
-    There was an error submitting your message. Please try again.
+    <div class="flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span id="error-message">There was an error submitting your message. Please try again.</span>
+    </div>
   </div>
 </form>
 
 <script>
-  const form = document.getElementById('contact-form');
-  const successMessage = document.getElementById('form-success');
-  const errorMessage = document.getElementById('form-error');
-  
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
+  import { createClient } from '@supabase/supabase-js';
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const submitText = document.getElementById('submit-text');
+    const submitLoading = document.getElementById('submit-loading');
+    const successMessage = document.getElementById('form-success');
+    const errorMessage = document.getElementById('form-error');
+    const errorMessageText = document.getElementById('error-message');
     
-    // In a real implementation, you would send the form data to your server
-    // For demonstration purposes, we'll just show the success message
+    function showLoading() {
+      submitBtn.disabled = true;
+      submitText.classList.add('hidden');
+      submitLoading.classList.remove('hidden');
+    }
     
-    successMessage.classList.remove('hidden');
-    form.reset();
+    function hideLoading() {
+      submitBtn.disabled = false;
+      submitText.classList.remove('hidden');
+      submitLoading.classList.add('hidden');
+    }
     
-    // Scroll to the success message
-    successMessage.scrollIntoView({ behavior: 'smooth' });
+    function showSuccess() {
+      successMessage.classList.remove('hidden');
+      errorMessage.classList.add('hidden');
+      
+      // Scroll to the success message
+      successMessage.scrollIntoView({ behavior: 'smooth' });
+      
+      // Hide the success message after 10 seconds
+      setTimeout(() => {
+        successMessage.classList.add('hidden');
+      }, 10000);
+    }
     
-    // Hide the success message after 5 seconds
-    setTimeout(() => {
+    function showError(message = 'There was an error submitting your message. Please try again.') {
+      errorMessageText.textContent = message;
+      errorMessage.classList.remove('hidden');
       successMessage.classList.add('hidden');
-    }, 5000);
+      
+      // Scroll to the error message
+      errorMessage.scrollIntoView({ behavior: 'smooth' });
+      
+      // Hide the error message after 10 seconds
+      setTimeout(() => {
+        errorMessage.classList.add('hidden');
+      }, 10000);
+    }
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Hide any existing messages
+      successMessage.classList.add('hidden');
+      errorMessage.classList.add('hidden');
+      
+      showLoading();
+      
+      try {
+        // Collect form data
+        const formData = new FormData(form);
+        
+        // Get all selected designations
+        const designations = [];
+        const designationInputs = form.querySelectorAll('input[name="designations"]:checked');
+        designationInputs.forEach(input => {
+          designations.push(input.value);
+        });
+        
+        // Prepare the data object
+        const contactData = {
+          name: formData.get('name'),
+          email: formData.get('email'),
+          phone: formData.get('phone') || '',
+          roast_level: formData.get('roast_level'),
+          designations: designations,
+          message: formData.get('message'),
+          newsletter: formData.get('newsletter') === 'on'
+        };
+        
+        // Validate required fields
+        if (!contactData.name || !contactData.email || !contactData.roast_level || !contactData.message) {
+          throw new Error('Please fill in all required fields.');
+        }
+        
+        // Send the email via Supabase edge function
+        const response = await fetch(`${supabaseUrl}/functions/v1/send-contact-email`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${supabaseAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(contactData),
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || result.message || 'Failed to send message');
+        }
+        
+        // Success!
+        showSuccess();
+        form.reset();
+        
+      } catch (error) {
+        console.error('Contact form error:', error);
+        showError(error.message);
+      } finally {
+        hideLoading();
+      }
+    });
   });
 </script>
