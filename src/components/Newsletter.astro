@@ -9,10 +9,12 @@
         Subscribe to our newsletter for brewing tips, special offers, and first access to new releases.
       </p>
       
-      <form class="max-w-md mx-auto">
+      <form id="newsletter-form" class="max-w-md mx-auto">
         <div class="flex">
           <input 
             type="email" 
+            id="newsletter-email"
+            name="email"
             placeholder="Your email address" 
             class="form-input rounded-r-none flex-grow"
             required
@@ -20,12 +22,145 @@
           <button 
             type="submit" 
             class="btn-primary rounded-l-none"
+            id="newsletter-submit"
           >
-            Subscribe
+            <span id="newsletter-text">Subscribe</span>
+            <div id="newsletter-loading" class="hidden flex items-center">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Subscribing...
+            </div>
           </button>
         </div>
         <p class="text-sm text-primary-600 mt-2">We respect your privacy and will never share your information.</p>
+        
+        <!-- Success Message -->
+        <div id="newsletter-success" class="hidden mt-4 p-4 bg-success-100 text-success-700 rounded-md">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Thank you for subscribing! You'll receive our latest updates and special offers.
+          </div>
+        </div>
+        
+        <!-- Error Message -->
+        <div id="newsletter-error" class="hidden mt-4 p-4 bg-error-100 text-error-700 rounded-md">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="newsletter-error-message">There was an error subscribing. Please try again.</span>
+          </div>
+        </div>
       </form>
     </div>
   </div>
 </section>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('newsletter-form');
+    const emailInput = document.getElementById('newsletter-email');
+    const submitBtn = document.getElementById('newsletter-submit');
+    const submitText = document.getElementById('newsletter-text');
+    const submitLoading = document.getElementById('newsletter-loading');
+    const successMessage = document.getElementById('newsletter-success');
+    const errorMessage = document.getElementById('newsletter-error');
+    const errorMessageText = document.getElementById('newsletter-error-message');
+    
+    function showLoading() {
+      submitBtn.disabled = true;
+      submitText.classList.add('hidden');
+      submitLoading.classList.remove('hidden');
+    }
+    
+    function hideLoading() {
+      submitBtn.disabled = false;
+      submitText.classList.remove('hidden');
+      submitLoading.classList.add('hidden');
+    }
+    
+    function showSuccess() {
+      successMessage.classList.remove('hidden');
+      errorMessage.classList.add('hidden');
+      
+      // Hide the success message after 8 seconds
+      setTimeout(() => {
+        successMessage.classList.add('hidden');
+      }, 8000);
+    }
+    
+    function showError(message = 'There was an error subscribing. Please try again.') {
+      errorMessageText.textContent = message;
+      errorMessage.classList.remove('hidden');
+      successMessage.classList.add('hidden');
+      
+      // Hide the error message after 8 seconds
+      setTimeout(() => {
+        errorMessage.classList.add('hidden');
+      }, 8000);
+    }
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Hide any existing messages
+      successMessage.classList.add('hidden');
+      errorMessage.classList.add('hidden');
+      
+      const email = emailInput.value.trim();
+      
+      // Basic validation
+      if (!email) {
+        showError('Please enter your email address.');
+        return;
+      }
+      
+      // Email format validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showError('Please enter a valid email address.');
+        return;
+      }
+      
+      showLoading();
+      
+      try {
+        // Send the subscription via Supabase edge function
+        const response = await fetch(`${supabaseUrl}/functions/v1/newsletter-subscribe`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${supabaseAnonKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || result.message || 'Failed to subscribe');
+        }
+        
+        // Success!
+        showSuccess();
+        form.reset();
+        
+      } catch (error) {
+        console.error('Newsletter subscription error:', error);
+        showError(error.message);
+      } finally {
+        hideLoading();
+      }
+    });
+  });
+</script>
