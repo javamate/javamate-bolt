@@ -1,6 +1,8 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 
 const MAILERSEND_API_TOKEN = Deno.env.get('MAILERSEND_API_TOKEN');
+const CONTACT_RECIPIENT_EMAIL = Deno.env.get('CONTACT_RECIPIENT_EMAIL') || 'info@javamate.net';
+const CONTACT_RECIPIENT_NAME = Deno.env.get('CONTACT_RECIPIENT_NAME') || 'Javamate Coffee Team';
 const MAILERSEND_API_URL = 'https://api.mailersend.com/v1/email';
 
 const corsHeaders = {
@@ -168,8 +170,8 @@ ${formData.message}
       },
       to: [
         {
-          email: "info@javamate.net",
-          name: "Javamate Coffee Team"
+          email: CONTACT_RECIPIENT_EMAIL,
+          name: CONTACT_RECIPIENT_NAME
         }
       ],
       reply_to: {
