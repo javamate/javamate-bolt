@@ -1,5 +1,4 @@
-import pkg from '@crystallize/js-api-client';
-const { createClient } = pkg;
+import { createClient } from '@crystallize/js-api-client';
 
 // Initialize Crystallize client
 const client = createClient({
