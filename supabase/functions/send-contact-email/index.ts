@@ -163,7 +163,7 @@ ${formData.message}
     // Prepare MailerSend payload
     const mailersendPayload = {
       from: {
-        email: "noreply@javamate.net",
+        email: "noreply@test-z0vklo6njjvl7qrx.mlsender.net",
         name: "Javamate Contact Form"
       },
       to: [
