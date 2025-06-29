@@ -209,7 +209,25 @@ ${formData.message}
       );
     }
 
-    const result = await response.json();
+    // Safely parse JSON response with error handling
+    let result;
+    try {
+      const responseText = await response.text();
+      console.log('MailerSend raw response:', responseText);
+      
+      if (responseText.trim() === '') {
+        // Empty response is considered success for MailerSend
+        result = { message_id: 'success' };
+      } else {
+        result = JSON.parse(responseText);
+      }
+    } catch (parseError) {
+      console.error('Failed to parse MailerSend response as JSON:', parseError);
+      // If we can't parse the response but the HTTP status was OK, 
+      // we'll assume the email was sent successfully
+      result = { message_id: 'success_no_json' };
+    }
+
     console.log('Email sent successfully:', result);
 
     return new Response(
