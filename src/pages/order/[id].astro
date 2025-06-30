@@ -184,7 +184,7 @@ if (!id) {
   </div>
 </Layout>
 
-<script type="module" define:vars={{ orderId: id }}>
+<script type="module">
   import { createClient } from '@supabase/supabase-js';
 
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -197,13 +197,22 @@ if (!id) {
     const errorContent = document.getElementById('error-content');
     const errorMessage = document.getElementById('error-message');
 
+    // Get order ID from URL
+    const pathParts = window.location.pathname.split('/');
+    const orderId = pathParts[pathParts.length - 1];
+
+    console.log('Loading order with ID:', orderId);
+
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      console.log('Authentication failed, redirecting to login');
       window.location.href = '/login';
       return;
     }
+
+    console.log('User authenticated:', user.email);
 
     try {
       // Load order details
@@ -228,23 +237,41 @@ if (!id) {
 
     async function loadOrderDetails(orderIdParam) {
       try {
-        // Fetch order from database
-        const { data: order, error } = await supabase
+        console.log('Fetching order from database with ID:', orderIdParam);
+
+        // First, try to find the order by the order_id field (which should be a bigint)
+        let { data: order, error } = await supabase
           .from('stripe_user_orders')
           .select('*')
-          .eq('order_id', orderIdParam)
+          .eq('order_id', parseInt(orderIdParam))
           .maybeSingle();
 
+        // If not found by order_id, try by id field
+        if (!order && !error) {
+          console.log('Order not found by order_id, trying by id field');
+          const result = await supabase
+            .from('stripe_user_orders')
+            .select('*')
+            .eq('id', parseInt(orderIdParam))
+            .maybeSingle();
+          
+          order = result.data;
+          error = result.error;
+        }
+
         if (error) {
-          console.error('Error fetching order:', error);
-          showError('Failed to load order details.');
+          console.error('Database error fetching order:', error);
+          showError('Failed to load order details from database.');
           return;
         }
 
         if (!order) {
+          console.log('Order not found in database');
           showError('Order not found or you do not have permission to view it.');
           return;
         }
+
+        console.log('Order found:', order);
 
         // Display order details
         displayOrderDetails(order);
@@ -252,15 +279,20 @@ if (!id) {
 
       } catch (error) {
         console.error('Error in loadOrderDetails:', error);
-        showError('An unexpected error occurred.');
+        showError('An unexpected error occurred while loading order details.');
       }
     }
 
     function displayOrderDetails(order) {
+      console.log('Displaying order details:', order);
+
       // Update order header
-      document.getElementById('order-number').textContent = `#${order.order_id}`;
-      document.getElementById('breadcrumb-order-id').textContent = `#${order.order_id}`;
-      document.getElementById('order-date').textContent = new Date(order.order_date).toLocaleDateString('en-US', {
+      document.getElementById('order-number').textContent = `#${order.order_id || order.id}`;
+      document.getElementById('breadcrumb-order-id').textContent = `#${order.order_id || order.id}`;
+      
+      // Format the order date
+      const orderDate = new Date(order.order_date || order.created_at);
+      document.getElementById('order-date').textContent = orderDate.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -270,21 +302,30 @@ if (!id) {
 
       // Update status badge
       const statusBadge = document.getElementById('order-status-badge');
-      const statusClass = getStatusClass(order.order_status);
-      statusBadge.textContent = order.order_status.charAt(0).toUpperCase() + order.order_status.slice(1);
+      const orderStatus = order.order_status || order.status || 'pending';
+      const statusClass = getStatusClass(orderStatus);
+      statusBadge.textContent = orderStatus.charAt(0).toUpperCase() + orderStatus.slice(1);
       statusBadge.className = `px-4 py-2 rounded-full text-sm font-medium ${statusClass}`;
 
       // Update payment and amount info
-      document.getElementById('payment-status').textContent = order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1);
-      document.getElementById('total-amount').textContent = `$${(order.amount_total / 100).toFixed(2)}`;
-      document.getElementById('currency').textContent = order.currency.toUpperCase();
-      document.getElementById('transaction-id').textContent = order.payment_intent_id;
+      const paymentStatus = order.payment_status || 'unknown';
+      document.getElementById('payment-status').textContent = paymentStatus.charAt(0).toUpperCase() + paymentStatus.slice(1);
+      
+      const totalAmount = order.amount_total || 0;
+      document.getElementById('total-amount').textContent = `$${(totalAmount / 100).toFixed(2)}`;
+      
+      const currency = order.currency || 'usd';
+      document.getElementById('currency').textContent = currency.toUpperCase();
+      
+      const transactionId = order.payment_intent_id || order.checkout_session_id || 'N/A';
+      document.getElementById('transaction-id').textContent = transactionId;
 
       // Update order summary
-      document.getElementById('subtotal-amount').textContent = `$${(order.amount_subtotal / 100).toFixed(2)}`;
-      document.getElementById('summary-total').textContent = `$${(order.amount_total / 100).toFixed(2)}`;
+      const subtotalAmount = order.amount_subtotal || order.amount_total || 0;
+      document.getElementById('subtotal-amount').textContent = `$${(subtotalAmount / 100).toFixed(2)}`;
+      document.getElementById('summary-total').textContent = `$${(totalAmount / 100).toFixed(2)}`;
 
-      // Display order items (for now, we'll show a generic item since we don't have line items stored)
+      // Display order items
       displayOrderItems(order);
     }
 
@@ -293,6 +334,7 @@ if (!id) {
       
       // Since we don't have detailed line items in the current schema,
       // we'll display a summary item based on the order total
+      const totalAmount = order.amount_total || 0;
       const itemHtml = `
         <div class="border border-primary-200 rounded-lg p-6">
           <div class="flex items-start space-x-4">
@@ -315,8 +357,8 @@ if (!id) {
                   </div>
                 </div>
                 <div class="text-right">
-                  <p class="text-lg font-semibold text-primary-900">$${(order.amount_total / 100).toFixed(2)}</p>
-                  <p class="text-sm text-primary-600">Unit Price</p>
+                  <p class="text-lg font-semibold text-primary-900">$${(totalAmount / 100).toFixed(2)}</p>
+                  <p class="text-sm text-primary-600">Total Price</p>
                 </div>
               </div>
             </div>
