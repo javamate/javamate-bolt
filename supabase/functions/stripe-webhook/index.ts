@@ -98,6 +98,9 @@ async function handleEvent(event: Stripe.Event) {
           amount_subtotal,
           amount_total,
           currency,
+          customer_details,
+          shipping_details,
+          metadata,
         } = stripeData as Stripe.Checkout.Session;
 
         // Insert the order into the stripe_orders table
@@ -116,11 +119,122 @@ async function handleEvent(event: Stripe.Event) {
           console.error('Error inserting order:', orderError);
           return;
         }
+        
         console.info(`Successfully processed one-time payment for session: ${checkout_session_id}`);
+
+        // Send order to Crystallize
+        await sendOrderToCrystallize({
+          checkout_session_id,
+          payment_intent_id: payment_intent as string,
+          customer_id: customerId,
+          amount_subtotal: amount_subtotal || 0,
+          amount_total: amount_total || 0,
+          currency: currency || 'usd',
+          customer_details,
+          shipping_details,
+          metadata: metadata || {},
+        });
+
       } catch (error) {
         console.error('Error processing one-time payment:', error);
       }
     }
+  }
+}
+
+async function sendOrderToCrystallize(orderInfo: {
+  checkout_session_id: string;
+  payment_intent_id: string;
+  customer_id: string;
+  amount_subtotal: number;
+  amount_total: number;
+  currency: string;
+  customer_details?: Stripe.Checkout.Session.CustomerDetails | null;
+  shipping_details?: Stripe.Checkout.Session.ShippingDetails | null;
+  metadata: Record<string, string>;
+}) {
+  try {
+    console.log(`Sending order to Crystallize for session: ${orderInfo.checkout_session_id}`);
+
+    // Get the full checkout session with line items
+    const session = await stripe.checkout.sessions.retrieve(orderInfo.checkout_session_id, {
+      expand: ['line_items', 'line_items.data.price.product']
+    });
+
+    // Extract line items information
+    const lineItems = session.line_items?.data.map(item => {
+      const price = item.price;
+      const product = price?.product as Stripe.Product;
+      
+      // Extract variant information from metadata
+      const variantId = price?.metadata?.variant_id || product?.metadata?.variant_id || `variant-${Date.now()}`;
+      const size = price?.metadata?.size || product?.metadata?.size || '12oz';
+      const grind = price?.metadata?.grind || product?.metadata?.grind || 'whole-bean';
+      
+      return {
+        variantId,
+        productName: product?.name || 'Coffee',
+        size,
+        grind,
+        quantity: item.quantity || 1,
+        unitPrice: (price?.unit_amount || 0) / 100, // Convert from cents
+        totalPrice: ((price?.unit_amount || 0) * (item.quantity || 1)) / 100,
+      };
+    }) || [];
+
+    // Calculate shipping cost (difference between total and subtotal, minus tax)
+    const shippingCost = (orderInfo.amount_total - orderInfo.amount_subtotal) / 100;
+    const taxAmount = 0; // We're not collecting tax currently
+
+    // Prepare order data for Crystallize
+    const crystallizeOrderData = {
+      orderId: orderInfo.checkout_session_id,
+      customerId: orderInfo.customer_id,
+      customerEmail: orderInfo.customer_details?.email || 'unknown@example.com',
+      customerName: orderInfo.customer_details?.name || undefined,
+      customerPhone: orderInfo.customer_details?.phone || undefined,
+      shippingAddress: orderInfo.shipping_details?.address ? {
+        line1: orderInfo.shipping_details.address.line1 || '',
+        line2: orderInfo.shipping_details.address.line2 || undefined,
+        city: orderInfo.shipping_details.address.city || '',
+        state: orderInfo.shipping_details.address.state || '',
+        postal_code: orderInfo.shipping_details.address.postal_code || '',
+        country: orderInfo.shipping_details.address.country || 'US',
+      } : undefined,
+      lineItems,
+      subtotal: orderInfo.amount_subtotal / 100,
+      shipping: shippingCost,
+      tax: taxAmount,
+      total: orderInfo.amount_total / 100,
+      currency: orderInfo.currency,
+      paymentIntentId: orderInfo.payment_intent_id,
+      checkoutSessionId: orderInfo.checkout_session_id,
+      orderDate: new Date().toISOString(),
+    };
+
+    // Call the Crystallize order function
+    const crystallizeResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/crystallize-order`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(crystallizeOrderData),
+    });
+
+    if (!crystallizeResponse.ok) {
+      const errorText = await crystallizeResponse.text();
+      console.error('Failed to send order to Crystallize:', crystallizeResponse.status, errorText);
+      return;
+    }
+
+    const result = await crystallizeResponse.json();
+    console.log(`Successfully sent order to Crystallize:`, result);
+
+  } catch (error) {
+    console.error('Error sending order to Crystallize:', error);
+    // Don't throw the error - we don't want to fail the webhook processing
+    // if Crystallize integration fails
   }
 }
 
