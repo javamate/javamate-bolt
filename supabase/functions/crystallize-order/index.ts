@@ -258,7 +258,7 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
     // Create the order mutation
     const createOrderMutation = `
       mutation CreateOrder($input: CreateOrderInput!) {
-        order {
+        orders {
           create(input: $input) {
             id
             createdAt
