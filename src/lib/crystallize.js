@@ -684,12 +684,12 @@ function getDemoProducts() {
         featuredImage: {
           fields: {
             file: {
-              url: 'https://images.pexels.com/photos/2262675/pexels-photo-2262675.jpeg?auto=compress&cs=tinysrgb&w=800'
+              url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=compress&cs=tinysrgb&w=800'
             }
           }
         },
         images: [
-          { fields: { file: { url: 'https://images.pexels.com/photos/2262675/pexels-photo-2262675.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+          { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
           { fields: { file: { url: 'https://images.pexels.com/photos/851555/pexels-photo-851555.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
         ],
         variants: [
@@ -747,12 +747,12 @@ function getDemoProducts() {
         featuredImage: {
           fields: {
             file: {
-              url: 'https://images.pexels.com/photos/2252400/pexels-photo-2252400.jpeg?auto=compress&cs=tinysrgb&w=800'
+              url: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg?auto=compress&cs=tinysrgb&w=800'
             }
           }
         },
         images: [
-          { fields: { file: { url: 'https://images.pexels.com/photos/2252400/pexels-photo-2252400.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+          { fields: { file: { url: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
           { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
         ],
         variants: [

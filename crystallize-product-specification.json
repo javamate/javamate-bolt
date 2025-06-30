@@ -206,7 +206,7 @@
         "new-arrival": true,
         "images": [
           {
-            "src": "https://images.pexels.com/photos/2074130/pexels-photo-2074130.jpeg",
+            "src": "https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg",
             "altText": "Ethiopian Yirgacheffe coffee beans"
           }
         ],
@@ -310,7 +310,7 @@
         "new-arrival": false,
         "images": [
           {
-            "src": "https://images.pexels.com/photos/2299028/pexels-photo-2299028.jpeg",
+            "src": "https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg",
             "altText": "Colombian Supremo coffee beans"
           }
         ],
@@ -414,7 +414,7 @@
         "new-arrival": false,
         "images": [
           {
-            "src": "https://images.pexels.com/photos/2262675/pexels-photo-2262675.jpeg",
+            "src": "https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg",
             "altText": "Guatemala Antigua coffee beans"
           }
         ],
@@ -518,7 +518,7 @@
         "new-arrival": false,
         "images": [
           {
-            "src": "https://images.pexels.com/photos/2252400/pexels-photo-2252400.jpeg",
+            "src": "https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg",
             "altText": "Sumatra Mandheling coffee beans"
           }
         ],
@@ -622,7 +622,7 @@
         "new-arrival": true,
         "images": [
           {
-            "src": "https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg",
+            "src": "https://images.pexels.com/photos/2074130/pexels-photo-2074130.jpeg",
             "altText": "Peru SWP Decaf coffee beans"
           }
         ],
