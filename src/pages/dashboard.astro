@@ -72,7 +72,12 @@ import Layout from '../layouts/Layout.astro';
 
             <!-- Recent Orders -->
             <div class="card p-6">
-              <h3 class="text-2xl font-semibold mb-6">Recent Orders</h3>
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-semibold">Recent Orders</h3>
+                <a href="/orders" class="text-primary-600 hover:text-primary-800 text-sm font-medium">
+                  View All Orders
+                </a>
+              </div>
               <div id="orders-list">
                 <div class="text-center py-8">
                   <div class="coffee-loader mb-4"></div>
@@ -292,17 +297,24 @@ import Layout from '../layouts/Layout.astro';
           ordersList.innerHTML = `
             <div class="space-y-4">
               ${data.map(order => `
-                <div class="border border-primary-200 rounded-lg p-4">
+                <div class="border border-primary-200 rounded-lg p-4 hover:shadow-medium transition-shadow">
                   <div class="flex justify-between items-start">
-                    <div>
-                      <p class="font-medium">Order #${order.order_id}</p>
+                    <div class="flex-grow">
+                      <div class="flex items-center space-x-3 mb-2">
+                        <a href="/order/${order.order_id}" class="font-medium text-primary-900 hover:text-primary-600 transition-colors">
+                          Order #${order.order_id}
+                        </a>
+                        <span class="text-xs px-2 py-1 rounded-full ${getStatusClass(order.order_status)}">
+                          ${order.order_status.charAt(0).toUpperCase() + order.order_status.slice(1)}
+                        </span>
+                      </div>
                       <p class="text-sm text-primary-600">${new Date(order.order_date).toLocaleDateString()}</p>
                     </div>
                     <div class="text-right">
                       <p class="font-semibold">$${(order.amount_total / 100).toFixed(2)}</p>
-                      <span class="text-xs px-2 py-1 bg-success-100 text-success-700 rounded-full capitalize">
-                        ${order.order_status}
-                      </span>
+                      <a href="/order/${order.order_id}" class="text-sm text-primary-600 hover:text-primary-800 transition-colors">
+                        View Details →
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -320,6 +332,20 @@ import Layout from '../layouts/Layout.astro';
             <p class="text-error-600">Error loading orders</p>
           </div>
         `;
+      }
+    }
+
+    function getStatusClass(status) {
+      switch (status.toLowerCase()) {
+        case 'completed':
+          return 'bg-success-100 text-success-700';
+        case 'pending':
+          return 'bg-warning-100 text-warning-700';
+        case 'canceled':
+        case 'cancelled':
+          return 'bg-error-100 text-error-700';
+        default:
+          return 'bg-primary-100 text-primary-700';
       }
     }
 
