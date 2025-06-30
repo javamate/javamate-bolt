@@ -70,11 +70,50 @@ const currentYear = new Date().getFullYear();
           <p class="text-primary-200 text-sm">© {currentYear} Javamate Coffee Roasters. All rights reserved.</p>
         </div>
         
+        <!-- Payment Methods with SVG Icons -->
         <div class="flex items-center space-x-4">
-          <img src="/images/payment-visa.svg" alt="Visa" class="h-8" />
-          <img src="/images/payment-mastercard.svg" alt="Mastercard" class="h-8" />
-          <img src="/images/payment-amex.svg" alt="American Express" class="h-8" />
-          <img src="/images/payment-paypal.svg" alt="PayPal" class="h-8" />
+          <!-- Visa -->
+          <div class="bg-white rounded px-2 py-1 h-8 flex items-center">
+            <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="40" height="24" rx="4" fill="white"/>
+              <path d="M16.1 18.5L18.2 5.5H21.8L19.7 18.5H16.1Z" fill="#1A1F71"/>
+              <path d="M31.1 5.8C30.5 5.6 29.5 5.4 28.2 5.4C24.9 5.4 22.6 7.2 22.6 9.7C22.6 11.6 24.3 12.7 25.6 13.3C26.9 13.9 27.4 14.3 27.4 14.9C27.4 15.8 26.3 16.2 25.3 16.2C23.9 16.2 23.1 16 22 15.5L21.5 15.3L21 18.1C22.2 18.6 24.4 19 26.7 19C30.3 19 32.5 17.2 32.5 14.6C32.5 13.2 31.6 12.1 29.6 11.2C28.5 10.7 27.8 10.3 27.8 9.6C27.8 9 28.6 8.4 30.3 8.4C31.5 8.4 32.4 8.6 33.1 8.9L33.5 9.1L34 6.4C33.2 6.1 32.1 5.8 31.1 5.8Z" fill="#1A1F71"/>
+              <path d="M37.5 5.5H34.9C34.1 5.5 33.5 5.7 33.2 6.4L28.1 18.5H31.7L32.4 16.6H36.8L37.2 18.5H40.3L37.5 5.5ZM33.4 13.8L35.2 9.2L36.1 13.8H33.4Z" fill="#1A1F71"/>
+              <path d="M13.4 5.5L10 18.5H6.4L4.6 8.1C4.5 7.6 4.3 7.2 3.8 7C2.9 6.6 1.7 6.2 0.7 5.9L0.8 5.5H6.8C7.6 5.5 8.2 5.8 8.4 6.5L9.7 12.8L12.8 5.5H16.4H13.4Z" fill="#1A1F71"/>
+            </svg>
+          </div>
+          
+          <!-- Mastercard -->
+          <div class="bg-white rounded px-2 py-1 h-8 flex items-center">
+            <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="40" height="24" rx="4" fill="white"/>
+              <circle cx="15" cy="12" r="7" fill="#EB001B"/>
+              <circle cx="25" cy="12" r="7" fill="#F79E1B"/>
+              <path d="M20 7.5C21.5 8.8 22.5 10.3 22.5 12C22.5 13.7 21.5 15.2 20 16.5C18.5 15.2 17.5 13.7 17.5 12C17.5 10.3 18.5 8.8 20 7.5Z" fill="#FF5F00"/>
+            </svg>
+          </div>
+          
+          <!-- American Express -->
+          <div class="bg-white rounded px-2 py-1 h-8 flex items-center">
+            <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="40" height="24" rx="4" fill="white"/>
+              <rect x="2" y="4" width="36" height="16" rx="2" fill="#006FCF"/>
+              <path d="M6 8H10L11 10L12 8H16V16H14V10L12.5 12H9.5L8 10V16H6V8Z" fill="white"/>
+              <path d="M18 8H26V10H20V11H25V13H20V14H26V16H18V8Z" fill="white"/>
+              <path d="M28 8H32L34 12L36 8H40V16H38V10L36 14H32L30 10V16H28V8Z" fill="white"/>
+            </svg>
+          </div>
+          
+          <!-- PayPal -->
+          <div class="bg-white rounded px-2 py-1 h-8 flex items-center">
+            <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="40" height="24" rx="4" fill="white"/>
+              <path d="M8 6H14C16.2 6 18 7.8 18 10C18 12.2 16.2 14 14 14H11L10 18H8L8 6Z" fill="#003087"/>
+              <path d="M11 8V12H14C15.1 12 16 11.1 16 10C16 8.9 15.1 8 14 8H11Z" fill="white"/>
+              <path d="M20 6H26C28.2 6 30 7.8 30 10C30 12.2 28.2 14 26 14H23L22 18H20L20 6Z" fill="#009CDE"/>
+              <path d="M23 8V12H26C27.1 12 28 11.1 28 10C28 8.9 27.1 8 26 8H23Z" fill="white"/>
+            </svg>
+          </div>
         </div>
 
         <!-- bolt.new Badge - Required for Hackathon - Bottom Right Position -->
