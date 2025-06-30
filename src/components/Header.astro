@@ -69,7 +69,11 @@ import { Icon } from 'astro-icon/components';
 </header>
 
 <script type="module">
-  import { supabase } from '../lib/supabaseClient.js';
+  import { createClient } from '@supabase/supabase-js';
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
   document.addEventListener('DOMContentLoaded', async () => {
     // Header scroll behavior

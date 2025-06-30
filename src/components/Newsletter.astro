@@ -61,7 +61,11 @@
 </section>
 
 <script type="module">
-  import { supabase } from '../lib/supabaseClient.js';
+  import { createClient } from '@supabase/supabase-js';
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('newsletter-form');
@@ -132,10 +136,10 @@
       
       try {
         // Send the subscription via Supabase edge function
-        const response = await fetch(`${import.meta.env.PUBLIC_SUPABASE_URL}/functions/v1/newsletter-subscribe`, {
+        const response = await fetch(`${supabaseUrl}/functions/v1/newsletter-subscribe`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${import.meta.env.PUBLIC_SUPABASE_ANON_KEY}`,
+            'Authorization': `Bearer ${supabaseAnonKey}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ email }),

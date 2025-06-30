@@ -138,8 +138,12 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script type="module">
-  import { supabase } from '../lib/supabaseClient.js';
+  import { createClient } from '@supabase/supabase-js';
   import { getProductByPriceId } from '../stripe-config';
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
   document.addEventListener('DOMContentLoaded', async () => {
     const loadingScreen = document.getElementById('loading-screen');
@@ -166,22 +170,31 @@ import Layout from '../layouts/Layout.astro';
         return;
       }
 
-      // Clear cart after successful payment
-      localStorage.removeItem('javamate-cart');
-      localStorage.setItem('cartCount', '0');
+      // Clear the cart now that payment is successful
+      clearCartAfterSuccessfulPayment();
       
-      // Update cart count display
-      const cartCount = document.getElementById('cart-count');
-      if (cartCount) {
-        cartCount.textContent = '0';
-      }
-
       // Try to find the order in our database
       await loadOrderDetails(sessionId);
       
     } catch (error) {
       console.error('Error loading success page:', error);
       showError();
+    }
+
+    function clearCartAfterSuccessfulPayment() {
+      try {
+        // Clear the cart from localStorage
+        localStorage.removeItem('javamate-cart');
+        localStorage.setItem('cartCount', '0');
+        
+        // Clear any checkout-related session storage
+        sessionStorage.removeItem('checkout-cart-backup');
+        sessionStorage.removeItem('pending-checkout-session');
+        
+        console.log('Cart cleared after successful payment');
+      } catch (error) {
+        console.error('Error clearing cart after payment:', error);
+      }
     }
 
     function showError() {
@@ -230,14 +243,14 @@ import Layout from '../layouts/Layout.astro';
       
       // Try to get product name from our config
       // Note: We don't have price_id in orders table, so we'll show a generic name
-      document.getElementById('product-name').textContent = 'Organic Peru SWP Decaf';
+      document.getElementById('product-name').textContent = 'Coffee Purchase';
     }
 
     function showGenericSuccess(sessionId) {
       // Show success page with generic details
       document.getElementById('order-id').textContent = sessionId.substring(0, 8).toUpperCase();
       document.getElementById('product-name').textContent = 'Coffee Purchase';
-      document.getElementById('amount').textContent = '$20.00';
+      document.getElementById('amount').textContent = 'Processing...';
       showSuccess();
     }
   });

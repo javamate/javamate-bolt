@@ -110,14 +110,18 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script type="module">
-  import { supabase } from '../lib/supabaseClient.js';
+  import { createClient } from '@supabase/supabase-js';
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
   document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('signup-form');
-    const button = document.getElementById('signup-button');
-    const messageDiv = document.getElementById('signup-message');
+    const form = document.getElementById('signup-form') as HTMLFormElement;
+    const button = document.getElementById('signup-button') as HTMLButtonElement;
+    const messageDiv = document.getElementById('signup-message') as HTMLDivElement;
 
-    function showMessage(message, type) {
+    function showMessage(message: string, type: 'success' | 'error') {
       messageDiv.textContent = message;
       messageDiv.className = `p-4 rounded-md ${
         type === 'success' 
@@ -136,10 +140,10 @@ import Layout from '../layouts/Layout.astro';
       hideMessage();
 
       const formData = new FormData(form);
-      const email = formData.get('email');
-      const password = formData.get('password');
-      const confirmPassword = formData.get('confirm-password');
-      const terms = formData.get('terms');
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+      const confirmPassword = formData.get('confirm-password') as string;
+      const terms = formData.get('terms') as string;
 
       // Validation
       if (!email || !password || !confirmPassword) {
@@ -186,7 +190,7 @@ import Layout from '../layouts/Layout.astro';
             window.location.href = '/dashboard';
           }, 1500);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Signup error:', error);
         showMessage(error.message || 'An error occurred during sign up', 'error');
       } finally {
