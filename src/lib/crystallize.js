@@ -2,14 +2,14 @@ import { createClient } from '@crystallize/js-api-client';
 
 // Initialize Crystallize client
 const client = createClient({
-  tenantIdentifier: import.meta.env.CRYSTALLIZE_TENANT_ID || 'demo-tenant',
+  tenantIdentifier: import.meta.env.CRYSTALLIZE_TENANT_IDENTIFIER || 'demo-tenant',
   accessTokenId: import.meta.env.CRYSTALLIZE_ACCESS_TOKEN_ID || 'demo-token-id',
   accessTokenSecret: import.meta.env.CRYSTALLIZE_ACCESS_TOKEN_SECRET || 'demo-token-secret',
 });
 
 // Initialize Crystallize Management API client
 const managementClient = createClient({
-  tenantIdentifier: import.meta.env.CRYSTALLIZE_TENANT_ID || 'demo-tenant',
+  tenantIdentifier: import.meta.env.CRYSTALLIZE_TENANT_IDENTIFIER || 'demo-tenant',
   accessTokenId: import.meta.env.CRYSTALLIZE_ACCESS_TOKEN_ID || 'demo-token-id',
   accessTokenSecret: import.meta.env.CRYSTALLIZE_ACCESS_TOKEN_SECRET || 'demo-token-secret',
   origin: 'https://pim.crystallize.com',
@@ -23,7 +23,7 @@ const managementClient = createClient({
 export async function getCrystallizeProducts(options = {}) {
   try {
     // Use demo data if in development without Crystallize credentials
-    if (import.meta.env.DEV && !import.meta.env.CRYSTALLIZE_TENANT_ID) {
+    if (import.meta.env.DEV && !import.meta.env.CRYSTALLIZE_TENANT_IDENTIFIER) {
       return getDemoProducts();
     }
 
@@ -143,7 +143,7 @@ export async function getCrystallizeProducts(options = {}) {
 export async function getCrystallizeProduct(path) {
   try {
     // Use demo data if in development without Crystallize credentials
-    if (import.meta.env.DEV && !import.meta.env.CRYSTALLIZE_TENANT_ID) {
+    if (import.meta.env.DEV && !import.meta.env.CRYSTALLIZE_TENANT_IDENTIFIER) {
       const demoProducts = getDemoProducts();
       return demoProducts.find(product => product.fields.slug === path) || null;
     }
@@ -342,7 +342,7 @@ function transformCrystallizeProduct(crystallizeProduct) {
 export async function updateVariantStripePriceId(productId, variantId, stripePriceId) {
   try {
     // Use demo mode if credentials are not available
-    if (import.meta.env.DEV && !import.meta.env.CRYSTALLIZE_TENANT_ID) {
+    if (import.meta.env.DEV && !import.meta.env.CRYSTALLIZE_TENANT_IDENTIFIER) {
       console.log(`Demo mode: Would update variant ${variantId} with Stripe price ID ${stripePriceId}`);
       return true;
     }
@@ -456,7 +456,7 @@ export async function batchUpdateVariantStripePriceIds(updates) {
  */
 export async function getProductVariant(productId, variantId) {
   try {
-    if (import.meta.env.DEV && !import.meta.env.CRYSTALLIZE_TENANT_ID) {
+    if (import.meta.env.DEV && !import.meta.env.CRYSTALLIZE_TENANT_IDENTIFIER) {
       // Return demo variant for development
       const demoProducts = getDemoProducts();
       for (const product of demoProducts) {
