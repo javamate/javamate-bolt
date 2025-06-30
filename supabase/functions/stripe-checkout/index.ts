@@ -253,7 +253,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create Checkout Session with shipping address collection
+    // Create Checkout Session with US-only shipping address collection
     const sessionData: any = {
       customer: customerId,
       payment_method_types: ['card'],
@@ -261,25 +261,20 @@ Deno.serve(async (req) => {
       mode: mode || 'payment',
       success_url,
       cancel_url,
-      // Require shipping address collection
+      // Require shipping address collection - US only
       shipping_address_collection: {
-        allowed_countries: [
-          'US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 
-          'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'IE', 'PT', 'LU', 'GR',
-          'CZ', 'PL', 'HU', 'SK', 'SI', 'EE', 'LV', 'LT', 'MT', 'CY',
-          'BG', 'RO', 'HR', 'JP', 'SG', 'HK', 'NZ', 'MX', 'BR'
-        ],
+        allowed_countries: ['US'],
       },
-      // Configure shipping options (optional - you can customize these)
+      // Configure shipping options with $6.99 standard shipping
       shipping_options: [
         {
           shipping_rate_data: {
             type: 'fixed_amount',
             fixed_amount: {
-              amount: 0, // Free shipping
+              amount: 699, // $6.99 for standard shipping
               currency: 'usd',
             },
-            display_name: 'Free Standard Shipping',
+            display_name: 'Standard Shipping',
             delivery_estimate: {
               minimum: {
                 unit: 'business_day',
@@ -339,7 +334,7 @@ Deno.serve(async (req) => {
 
     const session = await stripe.checkout.sessions.create(sessionData);
 
-    console.log(`Created checkout session ${session.id} for customer ${customerId} with ${checkoutLineItems.length} line items and shipping address collection enabled`);
+    console.log(`Created checkout session ${session.id} for customer ${customerId} with ${checkoutLineItems.length} line items and US-only shipping address collection enabled`);
 
     return corsResponse({ sessionId: session.id, url: session.url });
   } catch (error: any) {
