@@ -43,46 +43,11 @@ Deno.serve(async (req) => {
       return corsResponse({ error: 'Method not allowed' }, 405);
     }
 
-    const { price_id, variant_data, success_url, cancel_url, mode } = await req.json();
+    const { line_items, price_id, variant_data, success_url, cancel_url, mode } = await req.json();
 
     // Validate required parameters
     if (!success_url || !cancel_url) {
       return corsResponse({ error: 'Missing required URLs' }, 400);
-    }
-
-    // If no price_id provided but variant_data is available, create a new price
-    let finalPriceId = price_id;
-    
-    if (!finalPriceId && variant_data) {
-      try {
-        const price = await stripe.prices.create({
-          unit_amount: Math.round(variant_data.price * 100), // Convert to cents
-          currency: 'usd',
-          product_data: {
-            name: `${variant_data.product_name} - ${variant_data.size} ${variant_data.grind === 'whole-bean' ? 'Whole Bean' : variant_data.grind}`,
-            metadata: {
-              variant_id: variant_data.variant_id,
-              size: variant_data.size,
-              grind: variant_data.grind,
-            },
-          },
-          metadata: {
-            variant_id: variant_data.variant_id,
-            size: variant_data.size,
-            grind: variant_data.grind,
-          },
-        });
-        
-        finalPriceId = price.id;
-        console.log(`Created new Stripe price ${finalPriceId} for variant ${variant_data.variant_id}`);
-      } catch (priceError) {
-        console.error('Error creating Stripe price:', priceError);
-        return corsResponse({ error: 'Failed to create price' }, 500);
-      }
-    }
-
-    if (!finalPriceId) {
-      return corsResponse({ error: 'No price ID available' }, 400);
     }
 
     const authHeader = req.headers.get('Authorization')!;
@@ -200,22 +165,105 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Process line items - either multiple items or single item
+    let checkoutLineItems: any[] = [];
+
+    if (line_items && Array.isArray(line_items)) {
+      // Process multiple line items individually
+      for (const lineItem of line_items) {
+        let finalPriceId = lineItem.price_id;
+
+        // If no price_id provided but variant_data is available, create a new price
+        if (!finalPriceId && lineItem.variant_data) {
+          try {
+            const price = await stripe.prices.create({
+              unit_amount: Math.round(lineItem.variant_data.price * 100), // Convert to cents
+              currency: 'usd',
+              product_data: {
+                name: `${lineItem.variant_data.product_name} - ${lineItem.variant_data.size} ${lineItem.variant_data.grind === 'whole-bean' ? 'Whole Bean' : lineItem.variant_data.grind}`,
+                metadata: {
+                  variant_id: lineItem.variant_data.variant_id,
+                  size: lineItem.variant_data.size,
+                  grind: lineItem.variant_data.grind,
+                },
+              },
+              metadata: {
+                variant_id: lineItem.variant_data.variant_id,
+                size: lineItem.variant_data.size,
+                grind: lineItem.variant_data.grind,
+              },
+            });
+            
+            finalPriceId = price.id;
+            console.log(`Created new Stripe price ${finalPriceId} for variant ${lineItem.variant_data.variant_id}`);
+          } catch (priceError) {
+            console.error('Error creating Stripe price:', priceError);
+            return corsResponse({ error: 'Failed to create price for one of the items' }, 500);
+          }
+        }
+
+        if (!finalPriceId) {
+          return corsResponse({ error: 'No price ID available for one of the items' }, 400);
+        }
+
+        checkoutLineItems.push({
+          price: finalPriceId,
+          quantity: lineItem.quantity || 1,
+        });
+      }
+    } else {
+      // Handle single item (backward compatibility)
+      let finalPriceId = price_id;
+      
+      if (!finalPriceId && variant_data) {
+        try {
+          const price = await stripe.prices.create({
+            unit_amount: Math.round(variant_data.price * 100), // Convert to cents
+            currency: 'usd',
+            product_data: {
+              name: `${variant_data.product_name} - ${variant_data.size} ${variant_data.grind === 'whole-bean' ? 'Whole Bean' : variant_data.grind}`,
+              metadata: {
+                variant_id: variant_data.variant_id,
+                size: variant_data.size,
+                grind: variant_data.grind,
+              },
+            },
+            metadata: {
+              variant_id: variant_data.variant_id,
+              size: variant_data.size,
+              grind: variant_data.grind,
+            },
+          });
+          
+          finalPriceId = price.id;
+          console.log(`Created new Stripe price ${finalPriceId} for variant ${variant_data.variant_id}`);
+        } catch (priceError) {
+          console.error('Error creating Stripe price:', priceError);
+          return corsResponse({ error: 'Failed to create price' }, 500);
+        }
+      }
+
+      if (!finalPriceId) {
+        return corsResponse({ error: 'No price ID available' }, 400);
+      }
+
+      checkoutLineItems.push({
+        price: finalPriceId,
+        quantity: 1,
+      });
+    }
+
     // Create Checkout Session
     const sessionData: any = {
       customer: customerId,
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price: finalPriceId,
-          quantity: 1,
-        },
-      ],
+      line_items: checkoutLineItems,
       mode: mode || 'payment',
       success_url,
       cancel_url,
     };
 
-    // Add metadata if variant_data is provided
+    // Add metadata if variant_data is provided (for single item)
     if (variant_data) {
       sessionData.metadata = {
         variant_id: variant_data.variant_id,
@@ -223,11 +271,19 @@ Deno.serve(async (req) => {
         size: variant_data.size,
         grind: variant_data.grind,
       };
+    } else if (line_items && line_items.length > 0) {
+      // For multiple items, add summary metadata
+      sessionData.metadata = {
+        total_items: line_items.length.toString(),
+        item_summary: line_items.map(item => 
+          `${item.quantity}x ${item.variant_data?.product_name || 'Coffee'} (${item.variant_data?.size || '12oz'} ${item.variant_data?.grind || 'whole-bean'})`
+        ).join(', ').substring(0, 500), // Stripe metadata has a 500 char limit
+      };
     }
 
     const session = await stripe.checkout.sessions.create(sessionData);
 
-    console.log(`Created checkout session ${session.id} for customer ${customerId}`);
+    console.log(`Created checkout session ${session.id} for customer ${customerId} with ${checkoutLineItems.length} line items`);
 
     return corsResponse({ sessionId: session.id, url: session.url });
   } catch (error: any) {
@@ -235,28 +291,3 @@ Deno.serve(async (req) => {
     return corsResponse({ error: error.message }, 500);
   }
 });
-
-type ExpectedType = 'string' | { values: string[] };
-type Expectations<T> = { [K in keyof T]: ExpectedType };
-
-function validateParameters<T extends Record<string, any>>(values: T, expected: Expectations<T>): string | undefined {
-  for (const parameter in values) {
-    const expectation = expected[parameter];
-    const value = values[parameter];
-
-    if (expectation === 'string') {
-      if (value == null) {
-        return `Missing required parameter ${parameter}`;
-      }
-      if (typeof value !== 'string') {
-        return `Expected parameter ${parameter} to be a string got ${JSON.stringify(value)}`;
-      }
-    } else {
-      if (!expectation.values.includes(value)) {
-        return `Expected parameter ${parameter} to be one of ${expectation.values.join(', ')}`;
-      }
-    }
-  }
-
-  return undefined;
-}
