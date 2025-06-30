@@ -91,13 +91,13 @@ function getDemoData(contentType) {
             featuredImage: {
               fields: {
                 file: {
-                  url: 'https://images.pexels.com/photos/2074130/pexels-photo-2074130.jpeg'
+                  url: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg?auto=compress&cs=tinysrgb&w=800'
                 }
               }
             },
             images: [
-              { fields: { file: { url: 'https://images.pexels.com/photos/2074130/pexels-photo-2074130.jpeg' } } },
-              { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg' } } }
+              { fields: { file: { url: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+              { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
             ]
           }
         },
@@ -116,13 +116,13 @@ function getDemoData(contentType) {
             featuredImage: {
               fields: {
                 file: {
-                  url: 'https://images.pexels.com/photos/2299028/pexels-photo-2299028.jpeg'
+                  url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=compress&cs=tinysrgb&w=800'
                 }
               }
             },
             images: [
-              { fields: { file: { url: 'https://images.pexels.com/photos/2299028/pexels-photo-2299028.jpeg' } } },
-              { fields: { file: { url: 'https://images.pexels.com/photos/585753/pexels-photo-585753.jpeg' } } }
+              { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+              { fields: { file: { url: 'https://images.pexels.com/photos/585753/pexels-photo-585753.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
             ]
           }
         },
@@ -141,13 +141,13 @@ function getDemoData(contentType) {
             featuredImage: {
               fields: {
                 file: {
-                  url: 'https://www.rostovs.com/wp-content/uploads/2018/08/guatemala_antigua.jpg'
+                  url: 'https://images.pexels.com/photos/2262675/pexels-photo-2262675.jpeg?auto=compress&cs=tinysrgb&w=800'
                 }
               }
             },
             images: [
-              { fields: { file: { url: 'https://images.pexels.com/photos/2262675/pexels-photo-2262675.jpeg' } } },
-              { fields: { file: { url: 'https://images.pexels.com/photos/851555/pexels-photo-851555.jpeg' } } }
+              { fields: { file: { url: 'https://images.pexels.com/photos/2262675/pexels-photo-2262675.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+              { fields: { file: { url: 'https://images.pexels.com/photos/851555/pexels-photo-851555.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
             ]
           }
         },
@@ -166,13 +166,63 @@ function getDemoData(contentType) {
             featuredImage: {
               fields: {
                 file: {
-                  url: 'https://www.speederandearls.com/cdn/shop/products/Sumatra_Mandheling.jpg?v=1436889212'
+                  url: 'https://images.pexels.com/photos/2252400/pexels-photo-2252400.jpeg?auto=compress&cs=tinysrgb&w=800'
                 }
               }
             },
             images: [
-              { fields: { file: { url: 'https://images.pexels.com/photos/2252400/pexels-photo-2252400.jpeg' } } },
-              { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg' } } }
+              { fields: { file: { url: 'https://images.pexels.com/photos/2252400/pexels-photo-2252400.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+              { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
+            ]
+          }
+        },
+        {
+          sys: { id: 'product-5' },
+          fields: {
+            title: 'Organic Peru SWP Decaf',
+            slug: 'organic-peru-swp-decaf',
+            price: 19.99,
+            featured: false,
+            isNew: true,
+            shortDescription: 'Chemical-free decaf with rich chocolate and caramel notes.',
+            description: 'Our Organic Peru SWP Decaf is processed using the Swiss Water Process, a chemical-free decaffeination method that preserves the coffee\'s natural flavors while removing 99.9% of the caffeine.',
+            origin: 'Peru',
+            roastLevel: 'Medium',
+            featuredImage: {
+              fields: {
+                file: {
+                  url: 'https://images.pexels.com/photos/2074130/pexels-photo-2074130.jpeg?auto=compress&cs=tinysrgb&w=800'
+                }
+              }
+            },
+            images: [
+              { fields: { file: { url: 'https://images.pexels.com/photos/2074130/pexels-photo-2074130.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+              { fields: { file: { url: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
+            ]
+          }
+        },
+        {
+          sys: { id: 'product-6' },
+          fields: {
+            title: 'Javamate House Blend',
+            slug: 'javamate-house-blend',
+            price: 14.99,
+            featured: true,
+            isNew: false,
+            shortDescription: 'Our signature blend with perfect balance and versatility.',
+            description: 'Our signature House Blend combines the best characteristics of Central and South American coffees to create a perfectly balanced, approachable coffee that\'s perfect for any time of day.',
+            origin: 'Blend (Colombia, Brazil, Guatemala)',
+            roastLevel: 'Medium',
+            featuredImage: {
+              fields: {
+                file: {
+                  url: 'https://images.pexels.com/photos/585753/pexels-photo-585753.jpeg?auto=compress&cs=tinysrgb&w=800'
+                }
+              }
+            },
+            images: [
+              { fields: { file: { url: 'https://images.pexels.com/photos/585753/pexels-photo-585753.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+              { fields: { file: { url: 'https://images.pexels.com/photos/851555/pexels-photo-851555.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
             ]
           }
         }

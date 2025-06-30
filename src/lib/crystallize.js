@@ -558,13 +558,13 @@ function getDemoProducts() {
         featuredImage: {
           fields: {
             file: {
-              url: 'https://images.pexels.com/photos/2074130/pexels-photo-2074130.jpeg'
+              url: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg?auto=compress&cs=tinysrgb&w=800'
             }
           }
         },
         images: [
-          { fields: { file: { url: 'https://images.pexels.com/photos/2074130/pexels-photo-2074130.jpeg' } } },
-          { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg' } } }
+          { fields: { file: { url: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+          { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
         ],
         variants: [
           {
@@ -621,13 +621,13 @@ function getDemoProducts() {
         featuredImage: {
           fields: {
             file: {
-              url: 'https://images.pexels.com/photos/2299028/pexels-photo-2299028.jpeg'
+              url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=compress&cs=tinysrgb&w=800'
             }
           }
         },
         images: [
-          { fields: { file: { url: 'https://images.pexels.com/photos/2299028/pexels-photo-2299028.jpeg' } } },
-          { fields: { file: { url: 'https://images.pexels.com/photos/585753/pexels-photo-585753.jpeg' } } }
+          { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+          { fields: { file: { url: 'https://images.pexels.com/photos/585753/pexels-photo-585753.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
         ],
         variants: [
           {
@@ -684,13 +684,13 @@ function getDemoProducts() {
         featuredImage: {
           fields: {
             file: {
-              url: 'https://images.pexels.com/photos/2262675/pexels-photo-2262675.jpeg'
+              url: 'https://images.pexels.com/photos/2262675/pexels-photo-2262675.jpeg?auto=compress&cs=tinysrgb&w=800'
             }
           }
         },
         images: [
-          { fields: { file: { url: 'https://images.pexels.com/photos/2262675/pexels-photo-2262675.jpeg' } } },
-          { fields: { file: { url: 'https://images.pexels.com/photos/851555/pexels-photo-851555.jpeg' } } }
+          { fields: { file: { url: 'https://images.pexels.com/photos/2262675/pexels-photo-2262675.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+          { fields: { file: { url: 'https://images.pexels.com/photos/851555/pexels-photo-851555.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
         ],
         variants: [
           {
@@ -747,13 +747,13 @@ function getDemoProducts() {
         featuredImage: {
           fields: {
             file: {
-              url: 'https://images.pexels.com/photos/2252400/pexels-photo-2252400.jpeg'
+              url: 'https://images.pexels.com/photos/2252400/pexels-photo-2252400.jpeg?auto=compress&cs=tinysrgb&w=800'
             }
           }
         },
         images: [
-          { fields: { file: { url: 'https://images.pexels.com/photos/2252400/pexels-photo-2252400.jpeg' } } },
-          { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg' } } }
+          { fields: { file: { url: 'https://images.pexels.com/photos/2252400/pexels-photo-2252400.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+          { fields: { file: { url: 'https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
         ],
         variants: [
           {
@@ -790,6 +790,141 @@ function getDemoProducts() {
             size: '16oz',
             grind: 'medium',
             price: 23.99,
+            stripe_price_id: null,
+          }
+        ]
+      }
+    },
+    {
+      sys: { id: 'product-5' },
+      fields: {
+        title: 'Organic Peru SWP Decaf',
+        slug: 'organic-peru-swp-decaf',
+        price: 19.99,
+        featured: false,
+        isNew: true,
+        shortDescription: 'Chemical-free decaf with rich chocolate and caramel notes.',
+        description: 'Our Organic Peru SWP Decaf is processed using the Swiss Water Process, a chemical-free decaffeination method that preserves the coffee\'s natural flavors while removing 99.9% of the caffeine.',
+        origin: 'Peru',
+        roastLevel: 'Medium',
+        featuredImage: {
+          fields: {
+            file: {
+              url: 'https://images.pexels.com/photos/2074130/pexels-photo-2074130.jpeg?auto=compress&cs=tinysrgb&w=800'
+            }
+          }
+        },
+        images: [
+          { fields: { file: { url: 'https://images.pexels.com/photos/2074130/pexels-photo-2074130.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+          { fields: { file: { url: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
+        ],
+        variants: [
+          {
+            id: 'variant-5-1',
+            name: 'Organic Peru SWP Decaf - 12oz Whole Bean',
+            sku: 'PER-DEC-12-WB',
+            size: '12oz',
+            grind: 'whole-bean',
+            price: 19.99,
+            stripe_price_id: 'price_1RKgo2R1hBQXgqR7RYvtL02O',
+          },
+          {
+            id: 'variant-5-2',
+            name: 'Organic Peru SWP Decaf - 12oz Ground',
+            sku: 'PER-DEC-12-GR',
+            size: '12oz',
+            grind: 'medium',
+            price: 19.99,
+            stripe_price_id: null,
+          },
+          {
+            id: 'variant-5-3',
+            name: 'Organic Peru SWP Decaf - 16oz Whole Bean',
+            sku: 'PER-DEC-16-WB',
+            size: '16oz',
+            grind: 'whole-bean',
+            price: 24.99,
+            stripe_price_id: null,
+          },
+          {
+            id: 'variant-5-4',
+            name: 'Organic Peru SWP Decaf - 16oz Ground',
+            sku: 'PER-DEC-16-GR',
+            size: '16oz',
+            grind: 'medium',
+            price: 24.99,
+            stripe_price_id: null,
+          }
+        ]
+      }
+    },
+    {
+      sys: { id: 'product-6' },
+      fields: {
+        title: 'Javamate House Blend',
+        slug: 'javamate-house-blend',
+        price: 14.99,
+        featured: true,
+        isNew: false,
+        shortDescription: 'Our signature blend with perfect balance and versatility.',
+        description: 'Our signature House Blend combines the best characteristics of Central and South American coffees to create a perfectly balanced, approachable coffee that\'s perfect for any time of day.',
+        origin: 'Blend (Colombia, Brazil, Guatemala)',
+        roastLevel: 'Medium',
+        featuredImage: {
+          fields: {
+            file: {
+              url: 'https://images.pexels.com/photos/585753/pexels-photo-585753.jpeg?auto=compress&cs=tinysrgb&w=800'
+            }
+          }
+        },
+        images: [
+          { fields: { file: { url: 'https://images.pexels.com/photos/585753/pexels-photo-585753.jpeg?auto=compress&cs=tinysrgb&w=800' } } },
+          { fields: { file: { url: 'https://images.pexels.com/photos/851555/pexels-photo-851555.jpeg?auto=compress&cs=tinysrgb&w=800' } } }
+        ],
+        variants: [
+          {
+            id: 'variant-6-1',
+            name: 'Javamate House Blend - 12oz Whole Bean',
+            sku: 'HOU-BLE-12-WB',
+            size: '12oz',
+            grind: 'whole-bean',
+            price: 14.99,
+            stripe_price_id: null,
+          },
+          {
+            id: 'variant-6-2',
+            name: 'Javamate House Blend - 12oz Ground',
+            sku: 'HOU-BLE-12-GR',
+            size: '12oz',
+            grind: 'medium',
+            price: 14.99,
+            stripe_price_id: null,
+          },
+          {
+            id: 'variant-6-3',
+            name: 'Javamate House Blend - 16oz Whole Bean',
+            sku: 'HOU-BLE-16-WB',
+            size: '16oz',
+            grind: 'whole-bean',
+            price: 19.99,
+            stripe_price_id: null,
+          },
+          {
+            id: 'variant-6-4',
+            name: 'Javamate House Blend - 16oz Ground',
+            sku: 'HOU-BLE-16-GR',
+            size: '16oz',
+            grind: 'medium',
+            price: 19.99,
+            stripe_price_id: null,
+          },
+          {
+            id: 'variant-6-5',
+            name: 'Javamate House Blend - 2lb Whole Bean',
+            sku: 'HOU-BLE-2LB-WB',
+            size: '2lb',
+            grind: 'whole-bean',
+            price: 34.99,
             stripe_price_id: null,
           }
         ]
