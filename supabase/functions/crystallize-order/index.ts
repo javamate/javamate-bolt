@@ -182,20 +182,6 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
           name: 'No Tax',
           percent: 0
         }
-      },
-      productVariant: {
-        id: item.variantId,
-        name: item.productName,
-        attributes: [
-          {
-            attribute: 'size',
-            value: item.size
-          },
-          {
-            attribute: 'grind',
-            value: item.grind
-          }
-        ]
       }
     }));
 
