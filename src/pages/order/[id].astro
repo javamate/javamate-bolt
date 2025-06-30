@@ -184,7 +184,7 @@ if (!id) {
   </div>
 </Layout>
 
-<script type="module" define:vars={{ orderId: id }}>
+<script define:vars={{ orderId: id }}>
   import { createClient } from '@supabase/supabase-js';
 
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;

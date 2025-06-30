@@ -278,7 +278,7 @@ const grinds = [...new Set(variants.map(v => v.grind))];
   </section>
 </Layout>
 
-<script type="module" define:vars={{ variants }}>
+<script define:vars={{ variants }}>
   document.addEventListener('DOMContentLoaded', () => {
     // Image gallery functionality
     const mainImage = document.getElementById('main-image');
