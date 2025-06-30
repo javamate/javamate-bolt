@@ -1,5 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2.49.1';
+import { createClient as createCrystallizeClient } from 'npm:@crystallize/js-api-client@4.3.0';
 
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
@@ -46,6 +47,38 @@ interface CrystallizeOrderData {
   orderDate: string;
 }
 
+// Initialize Crystallize clients
+let catalogueClient: any = null;
+let pimClient: any = null;
+
+function initializeCrystallizeClients() {
+  if (!CRYSTALLIZE_TENANT_ID || !CRYSTALLIZE_ACCESS_TOKEN_ID || !CRYSTALLIZE_ACCESS_TOKEN_SECRET) {
+    throw new Error('Crystallize credentials not configured');
+  }
+
+  try {
+    // Catalogue API client (for reading data)
+    catalogueClient = createCrystallizeClient({
+      tenantIdentifier: CRYSTALLIZE_TENANT_ID,
+      accessTokenId: CRYSTALLIZE_ACCESS_TOKEN_ID,
+      accessTokenSecret: CRYSTALLIZE_ACCESS_TOKEN_SECRET,
+    });
+
+    // PIM API client (for creating orders)
+    pimClient = createCrystallizeClient({
+      tenantIdentifier: CRYSTALLIZE_TENANT_ID,
+      accessTokenId: CRYSTALLIZE_ACCESS_TOKEN_ID,
+      accessTokenSecret: CRYSTALLIZE_ACCESS_TOKEN_SECRET,
+      origin: 'https://pim.crystallize.com',
+    });
+
+    console.log(`Initialized Crystallize clients for tenant: ${CRYSTALLIZE_TENANT_ID}`);
+  } catch (error) {
+    console.error('Failed to initialize Crystallize clients:', error);
+    throw new Error(`Failed to initialize Crystallize clients: ${error.message}`);
+  }
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -63,16 +96,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!CRYSTALLIZE_TENANT_ID || !CRYSTALLIZE_ACCESS_TOKEN_ID || !CRYSTALLIZE_ACCESS_TOKEN_SECRET) {
-      console.error('Crystallize credentials not configured');
-      return new Response(
-        JSON.stringify({ error: 'Crystallize integration not configured' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
+    // Initialize Crystallize clients
+    initializeCrystallizeClients();
 
     const orderData: CrystallizeOrderData = await req.json();
 
@@ -128,24 +153,35 @@ Deno.serve(async (req) => {
 
 async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<string | null> {
   try {
-    // Validate tenant ID format
-    if (!CRYSTALLIZE_TENANT_ID || CRYSTALLIZE_TENANT_ID.length < 3) {
-      throw new Error('Invalid Crystallize tenant ID');
-    }
+    console.log('Creating Crystallize order with JS API client');
 
-    // Construct the correct API URL - try both PIM and Catalogue API endpoints
-    const pimApiUrl = `https://pim.crystallize.com/graphql/${CRYSTALLIZE_TENANT_ID}`;
-    const catalogueApiUrl = `https://api.crystallize.com/${CRYSTALLIZE_TENANT_ID}/catalogue`;
+    // Prepare customer information
+    const customerName = orderData.customerName || 'Customer';
+    const nameParts = customerName.split(' ');
     
-    // For order creation, we should use the PIM API
-    const apiUrl = pimApiUrl;
+    const customer = {
+      identifier: orderData.customerId,
+      firstName: nameParts[0] || 'Customer',
+      lastName: nameParts.slice(1).join(' ') || '',
+      email: orderData.customerEmail,
+      phone: orderData.customerPhone || '',
+    };
 
-    console.log('Using Crystallize API URL:', apiUrl);
+    // Prepare addresses if shipping address is provided
+    const addresses = orderData.shippingAddress ? [{
+      type: 'delivery',
+      street: orderData.shippingAddress.line1,
+      street2: orderData.shippingAddress.line2 || '',
+      city: orderData.shippingAddress.city,
+      state: orderData.shippingAddress.state,
+      postalCode: orderData.shippingAddress.postal_code,
+      country: orderData.shippingAddress.country,
+    }] : [];
 
     // Prepare line items for Crystallize
-    const crystallizeLineItems = orderData.lineItems.map(item => ({
+    const cart = orderData.lineItems.map(item => ({
       name: `${item.productName} - ${item.size} ${item.grind === 'whole-bean' ? 'Whole Bean' : item.grind}`,
-      sku: `${item.variantId}`,
+      sku: item.variantId,
       quantity: item.quantity,
       price: {
         gross: item.unitPrice,
@@ -172,68 +208,25 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
       }
     }));
 
-    // Prepare customer information
-    const customerName = orderData.customerName || 'Customer';
-    const nameParts = customerName.split(' ');
-    const customer = {
-      identifier: orderData.customerId,
-      firstName: nameParts[0] || 'Customer',
-      lastName: nameParts.slice(1).join(' ') || '',
-      email: orderData.customerEmail,
-      phone: orderData.customerPhone || '',
-      addresses: orderData.shippingAddress ? [{
-        type: 'delivery',
-        street: orderData.shippingAddress.line1,
-        street2: orderData.shippingAddress.line2 || '',
-        city: orderData.shippingAddress.city,
-        state: orderData.shippingAddress.state,
-        postalCode: orderData.shippingAddress.postal_code,
-        country: orderData.shippingAddress.country
-      }] : []
-    };
+    // Calculate tax percentage
+    const taxPercent = orderData.tax > 0 && orderData.subtotal > 0 
+      ? ((orderData.tax / orderData.subtotal) * 100) 
+      : 0;
 
-    // Create the order mutation for Crystallize
-    const createOrderMutation = `
-      mutation CreateOrder($input: CreateOrderInput!) {
-        order {
-          create(input: $input) {
-            id
-            createdAt
-            updatedAt
-            total {
-              gross
-              net
-              currency
-            }
-            customer {
-              identifier
-              email
-            }
-            cart {
-              name
-              sku
-              quantity
-              price {
-                gross
-                net
-                currency
-              }
-            }
-          }
-        }
-      }
-    `;
-
+    // Prepare the order input
     const orderInput = {
-      customer: customer,
-      cart: crystallizeLineItems,
+      customer: {
+        ...customer,
+        addresses: addresses
+      },
+      cart: cart,
       total: {
         gross: orderData.total,
         net: orderData.subtotal,
         currency: orderData.currency.toUpperCase(),
         tax: {
           name: 'Sales Tax',
-          percent: orderData.tax > 0 ? ((orderData.tax / orderData.subtotal) * 100) : 0
+          percent: taxPercent
         }
       },
       payment: [{
@@ -263,96 +256,91 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
         {
           key: 'shipping_cost',
           value: orderData.shipping.toString()
+        },
+        {
+          key: 'order_date',
+          value: orderData.orderDate
         }
       ]
     };
 
-    // Prepare authentication - try multiple authentication methods
-    const authHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'User-Agent': 'Javamate-Coffee-Integration/1.0',
-    };
-
-    // Method 1: Bearer token
-    const bearerToken = `${CRYSTALLIZE_ACCESS_TOKEN_ID}:${CRYSTALLIZE_ACCESS_TOKEN_SECRET}`;
-    authHeaders['Authorization'] = `Bearer ${bearerToken}`;
-
-    // Method 2: Custom headers (fallback)
-    authHeaders['X-Crystallize-Access-Token-ID'] = CRYSTALLIZE_ACCESS_TOKEN_ID;
-    authHeaders['X-Crystallize-Access-Token-Secret'] = CRYSTALLIZE_ACCESS_TOKEN_SECRET;
-
-    const requestBody = {
-      query: createOrderMutation,
-      variables: {
-        input: orderInput
+    // Create the order mutation
+    const createOrderMutation = `
+      mutation CreateOrder($input: CreateOrderInput!) {
+        order {
+          create(input: $input) {
+            id
+            createdAt
+            updatedAt
+            total {
+              gross
+              net
+              currency
+            }
+            customer {
+              identifier
+              email
+              firstName
+              lastName
+            }
+            cart {
+              name
+              sku
+              quantity
+              price {
+                gross
+                net
+                currency
+              }
+            }
+            meta {
+              key
+              value
+            }
+          }
+        }
       }
-    };
+    `;
 
-    console.log('Sending order to Crystallize:', {
-      url: apiUrl,
+    console.log('Sending order to Crystallize PIM API:', {
       customer: customer.email,
       total: orderData.total,
-      lineItems: crystallizeLineItems.length,
+      lineItems: cart.length,
       tenantId: CRYSTALLIZE_TENANT_ID
     });
 
-    // Send request to Crystallize with improved error handling
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: authHeaders,
-      body: JSON.stringify(requestBody)
+    // Use the PIM API client to create the order
+    const response = await pimClient.pimApi(createOrderMutation, {
+      input: orderInput
     });
 
-    console.log('Crystallize API response status:', response.status);
-    console.log('Crystallize API response headers:', Object.fromEntries(response.headers.entries()));
+    console.log('Crystallize PIM API response received');
 
-    // Get response text first to handle both JSON and HTML responses
-    const responseText = await response.text();
-    console.log('Crystallize API raw response (first 500 chars):', responseText.substring(0, 500));
-
-    if (!response.ok) {
-      // Check if response is HTML (error page)
-      if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
-        console.error('Crystallize API returned HTML error page instead of JSON');
-        
-        // Extract error information from HTML if possible
-        const titleMatch = responseText.match(/<title>(.*?)<\/title>/i);
-        const errorTitle = titleMatch ? titleMatch[1] : 'Unknown error';
-        
-        throw new Error(`Crystallize API error (${response.status}): ${errorTitle}. This usually indicates an authentication or endpoint issue.`);
-      }
+    // Check for GraphQL errors
+    if (response.errors && response.errors.length > 0) {
+      console.error('Crystallize GraphQL errors:', response.errors);
       
-      // Try to parse as JSON error
-      try {
-        const errorData = JSON.parse(responseText);
-        throw new Error(`Crystallize API error (${response.status}): ${JSON.stringify(errorData)}`);
-      } catch (parseError) {
-        throw new Error(`Crystallize API error (${response.status}): ${responseText}`);
-      }
+      // Extract meaningful error messages
+      const errorMessages = response.errors.map((error: any) => error.message).join(', ');
+      throw new Error(`Crystallize GraphQL errors: ${errorMessages}`);
     }
 
-    // Parse JSON response
-    let result;
-    try {
-      result = JSON.parse(responseText);
-    } catch (parseError) {
-      console.error('Failed to parse Crystallize response as JSON:', parseError);
-      console.error('Response text:', responseText);
-      throw new Error('Crystallize API returned invalid JSON response');
+    // Check for successful order creation
+    if (!response.data?.order?.create?.id) {
+      console.error('Unexpected Crystallize response structure:', response);
+      throw new Error('Order creation failed - no order ID returned from Crystallize');
     }
 
-    if (result.errors) {
-      console.error('Crystallize GraphQL errors:', result.errors);
-      throw new Error(`Crystallize GraphQL errors: ${JSON.stringify(result.errors)}`);
-    }
+    const crystallizeOrderId = response.data.order.create.id;
+    const createdOrder = response.data.order.create;
 
-    if (!result.data?.order?.create?.id) {
-      console.error('Unexpected Crystallize response structure:', result);
-      throw new Error('Unexpected response structure from Crystallize - order creation may have failed');
-    }
-
-    const crystallizeOrderId = result.data.order.create.id;
-    console.log(`Successfully created Crystallize order ${crystallizeOrderId}`);
+    console.log(`Successfully created Crystallize order:`, {
+      id: crystallizeOrderId,
+      customer: createdOrder.customer?.email,
+      total: createdOrder.total?.gross,
+      currency: createdOrder.total?.currency,
+      cartItems: createdOrder.cart?.length || 0
+    });
 
     return crystallizeOrderId;
 
@@ -374,12 +362,122 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
       console.error('Crystallize API endpoint not found. Please check your tenant ID.');
       throw new Error('Crystallize API endpoint not found. Please verify your tenant ID is correct.');
     }
-    
-    if (error.message?.includes('<!DOCTYPE')) {
-      throw new Error('Crystallize API returned an HTML error page instead of JSON. This usually indicates an authentication or configuration issue.');
+
+    if (error.message?.includes('ENOTFOUND') || error.message?.includes('network')) {
+      console.error('Network error connecting to Crystallize API.');
+      throw new Error('Network error connecting to Crystallize. Please check your internet connection and try again.');
     }
-    
+
+    if (error.message?.includes('timeout')) {
+      console.error('Timeout connecting to Crystallize API.');
+      throw new Error('Timeout connecting to Crystallize. The service may be temporarily unavailable.');
+    }
+
+    // Check for validation errors
+    if (error.message?.includes('validation') || error.message?.includes('invalid')) {
+      console.error('Validation error from Crystallize:', error.message);
+      throw new Error(`Crystallize validation error: ${error.message}`);
+    }
+
+    // Check for tenant-related errors
+    if (error.message?.includes('tenant') || error.message?.includes('Tenant')) {
+      console.error('Tenant-related error from Crystallize:', error.message);
+      throw new Error(`Crystallize tenant error: Please verify your tenant ID (${CRYSTALLIZE_TENANT_ID}) is correct.`);
+    }
+
     // Re-throw the original error if it's already descriptive
-    throw error;
+    throw new Error(`Failed to create Crystallize order: ${error.message}`);
+  }
+}
+
+async function validateCrystallizeConnection(): Promise<boolean> {
+  try {
+    if (!catalogueClient) {
+      throw new Error('Catalogue client not initialized');
+    }
+
+    // Simple query to test the connection
+    const testQuery = `
+      query TestConnection {
+        tenant {
+          identifier
+          name
+        }
+      }
+    `;
+
+    const response = await catalogueClient.catalogueApi(testQuery);
+    
+    if (response.errors) {
+      console.error('Crystallize connection test failed:', response.errors);
+      return false;
+    }
+
+    if (response.data?.tenant?.identifier) {
+      console.log(`Crystallize connection validated for tenant: ${response.data.tenant.identifier}`);
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Error validating Crystallize connection:', error);
+    return false;
+  }
+}
+
+// Helper function to get product information from Crystallize (if needed)
+async function getCrystallizeProduct(productId: string): Promise<any> {
+  try {
+    if (!catalogueClient) {
+      throw new Error('Catalogue client not initialized');
+    }
+
+    const productQuery = `
+      query GetProduct($id: ID!, $language: String!) {
+        catalogue(id: $id, language: $language) {
+          id
+          name
+          path
+          type
+          ... on Product {
+            defaultVariant {
+              id
+              name
+              sku
+              price
+              attributes {
+                attribute
+                value
+              }
+            }
+            variants {
+              id
+              name
+              sku
+              price
+              attributes {
+                attribute
+                value
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const response = await catalogueClient.catalogueApi(productQuery, {
+      id: productId,
+      language: 'en'
+    });
+
+    if (response.errors) {
+      console.error('Error fetching product from Crystallize:', response.errors);
+      return null;
+    }
+
+    return response.data?.catalogue || null;
+  } catch (error) {
+    console.error('Error getting Crystallize product:', error);
+    return null;
   }
 }
