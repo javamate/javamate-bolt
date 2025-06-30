@@ -253,7 +253,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create Checkout Session
+    // Create Checkout Session with shipping address collection
     const sessionData: any = {
       customer: customerId,
       payment_method_types: ['card'],
@@ -261,6 +261,62 @@ Deno.serve(async (req) => {
       mode: mode || 'payment',
       success_url,
       cancel_url,
+      // Require shipping address collection
+      shipping_address_collection: {
+        allowed_countries: [
+          'US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 
+          'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'IE', 'PT', 'LU', 'GR',
+          'CZ', 'PL', 'HU', 'SK', 'SI', 'EE', 'LV', 'LT', 'MT', 'CY',
+          'BG', 'RO', 'HR', 'JP', 'SG', 'HK', 'NZ', 'MX', 'BR'
+        ],
+      },
+      // Configure shipping options (optional - you can customize these)
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: {
+              amount: 0, // Free shipping
+              currency: 'usd',
+            },
+            display_name: 'Free Standard Shipping',
+            delivery_estimate: {
+              minimum: {
+                unit: 'business_day',
+                value: 3,
+              },
+              maximum: {
+                unit: 'business_day',
+                value: 7,
+              },
+            },
+          },
+        },
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: {
+              amount: 999, // $9.99 for expedited shipping
+              currency: 'usd',
+            },
+            display_name: 'Expedited Shipping',
+            delivery_estimate: {
+              minimum: {
+                unit: 'business_day',
+                value: 1,
+              },
+              maximum: {
+                unit: 'business_day',
+                value: 3,
+              },
+            },
+          },
+        },
+      ],
+      // Collect customer phone number as well (optional but recommended for shipping)
+      phone_number_collection: {
+        enabled: true,
+      },
     };
 
     // Add metadata if variant_data is provided (for single item)
@@ -283,7 +339,7 @@ Deno.serve(async (req) => {
 
     const session = await stripe.checkout.sessions.create(sessionData);
 
-    console.log(`Created checkout session ${session.id} for customer ${customerId} with ${checkoutLineItems.length} line items`);
+    console.log(`Created checkout session ${session.id} for customer ${customerId} with ${checkoutLineItems.length} line items and shipping address collection enabled`);
 
     return corsResponse({ sessionId: session.id, url: session.url });
   } catch (error: any) {
