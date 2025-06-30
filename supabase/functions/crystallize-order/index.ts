@@ -4,7 +4,7 @@ import { createClient as createCrystallizeClient } from 'npm:@crystallize/js-api
 
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
-const CRYSTALLIZE_TENANT_ID = Deno.env.get('CRYSTALLIZE_TENANT_ID');
+const CRYSTALLIZE_TENANT_IDENTIFIER = Deno.env.get('CRYSTALLIZE_TENANT_IDENTIFIER');
 const CRYSTALLIZE_ACCESS_TOKEN_ID = Deno.env.get('CRYSTALLIZE_ACCESS_TOKEN_ID');
 const CRYSTALLIZE_ACCESS_TOKEN_SECRET = Deno.env.get('CRYSTALLIZE_ACCESS_TOKEN_SECRET');
 
@@ -51,19 +51,19 @@ interface CrystallizeOrderData {
 let catalogueClient: any = null;
 
 function initializeCrystallizeClient() {
-  if (!CRYSTALLIZE_TENANT_ID || !CRYSTALLIZE_ACCESS_TOKEN_ID || !CRYSTALLIZE_ACCESS_TOKEN_SECRET) {
+  if (!CRYSTALLIZE_TENANT_IDENTIFIER || !CRYSTALLIZE_ACCESS_TOKEN_ID || !CRYSTALLIZE_ACCESS_TOKEN_SECRET) {
     throw new Error('Crystallize credentials not configured');
   }
 
   try {
     // Catalogue API client (for reading data and creating orders via orderApi)
     catalogueClient = createCrystallizeClient({
-      tenantIdentifier: CRYSTALLIZE_TENANT_ID,
+      tenantIdentifier: CRYSTALLIZE_TENANT_IDENTIFIER,
       accessTokenId: CRYSTALLIZE_ACCESS_TOKEN_ID,
       accessTokenSecret: CRYSTALLIZE_ACCESS_TOKEN_SECRET,
     });
 
-    console.log(`Initialized Crystallize catalogue client for tenant: ${CRYSTALLIZE_TENANT_ID}`);
+    console.log(`Initialized Crystallize catalogue client for tenant: ${CRYSTALLIZE_TENANT_IDENTIFIER}`);
   } catch (error) {
     console.error('Failed to initialize Crystallize client:', error);
     throw new Error(`Failed to initialize Crystallize client: ${error.message}`);
@@ -297,7 +297,7 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
       customer: customer.email,
       total: orderData.total,
       lineItems: cart.length,
-      tenantId: CRYSTALLIZE_TENANT_ID
+      tenantIdentifier: CRYSTALLIZE_TENANT_IDENTIFIER
     });
 
     // Use the orderApi function on the catalogueClient to create the order
@@ -373,7 +373,7 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
     // Check for tenant-related errors
     if (error.message?.includes('tenant') || error.message?.includes('Tenant')) {
       console.error('Tenant-related error from Crystallize:', error.message);
-      throw new Error(`Crystallize tenant error: Please verify your tenant ID (${CRYSTALLIZE_TENANT_ID}) is correct.`);
+      throw new Error(`Crystallize tenant error: Please verify your tenant Identifier (${CRYSTALLIZE_TENANT_IDENTIFIER}) is correct.`);
     }
 
     // Re-throw the original error if it's already descriptive
