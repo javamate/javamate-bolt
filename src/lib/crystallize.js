@@ -7,6 +7,14 @@ const client = createClient({
   accessTokenSecret: import.meta.env.CRYSTALLIZE_ACCESS_TOKEN_SECRET || 'demo-token-secret',
 });
 
+// Initialize Crystallize Management API client
+const managementClient = createClient({
+  tenantIdentifier: import.meta.env.CRYSTALLIZE_TENANT_ID || 'demo-tenant',
+  accessTokenId: import.meta.env.CRYSTALLIZE_ACCESS_TOKEN_ID || 'demo-token-id',
+  accessTokenSecret: import.meta.env.CRYSTALLIZE_ACCESS_TOKEN_SECRET || 'demo-token-secret',
+  origin: 'https://pim.crystallize.com',
+});
+
 /**
  * Fetch products from Crystallize
  * @param {Object} options - Query options
@@ -325,7 +333,7 @@ function transformCrystallizeProduct(crystallizeProduct) {
 }
 
 /**
- * Create or update a Stripe price ID for a product variant
+ * Create or update a Stripe price ID for a product variant using Crystallize Management API
  * @param {string} productId - Crystallize product ID
  * @param {string} variantId - Crystallize variant ID
  * @param {string} stripePriceId - Stripe price ID to store
@@ -333,33 +341,199 @@ function transformCrystallizeProduct(crystallizeProduct) {
  */
 export async function updateVariantStripePriceId(productId, variantId, stripePriceId) {
   try {
-    // In a real implementation, this would use Crystallize's management API
-    // to update the variant's externalReference field with the Stripe price ID
-    
+    // Use demo mode if credentials are not available
     if (import.meta.env.DEV && !import.meta.env.CRYSTALLIZE_TENANT_ID) {
       console.log(`Demo mode: Would update variant ${variantId} with Stripe price ID ${stripePriceId}`);
       return true;
     }
 
-    // This would require the Crystallize Management API
-    // const updateQuery = `
-    //   mutation UpdateVariant($id: ID!, $input: ProductVariantUpdateInput!) {
-    //     product {
-    //       updateVariant(id: $id, input: $input) {
-    //         id
-    //         externalReference
-    //       }
-    //     }
-    //   }
-    // `;
+    // Validate inputs
+    if (!productId || !variantId || !stripePriceId) {
+      console.error('Missing required parameters for updating variant Stripe price ID');
+      return false;
+    }
 
-    // For now, we'll just log this action
-    console.log(`Would update Crystallize variant ${variantId} with Stripe price ID ${stripePriceId}`);
-    return true;
+    // Use Crystallize Management API to update the variant's externalReference
+    const updateMutation = `
+      mutation UpdateProductVariant($productId: ID!, $variantId: ID!, $input: ProductVariantUpdateInput!) {
+        product {
+          updateVariant(productId: $productId, id: $variantId, input: $input) {
+            id
+            externalReference
+          }
+        }
+      }
+    `;
+
+    const variables = {
+      productId: productId,
+      variantId: variantId,
+      input: {
+        externalReference: stripePriceId
+      }
+    };
+
+    console.log(`Updating Crystallize variant ${variantId} with Stripe price ID ${stripePriceId}`);
+
+    const response = await managementClient.pimApi(updateMutation, variables);
+
+    if (response.errors) {
+      console.error('Crystallize Management API errors:', response.errors);
+      return false;
+    }
+
+    if (response.data?.product?.updateVariant) {
+      console.log(`Successfully updated variant ${variantId} with Stripe price ID ${stripePriceId}`);
+      return true;
+    } else {
+      console.error('Unexpected response structure from Crystallize Management API:', response);
+      return false;
+    }
 
   } catch (error) {
-    console.error('Error updating Crystallize variant:', error);
+    console.error('Error updating Crystallize variant with Stripe price ID:', error);
+    
+    // Check if it's an authentication error
+    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+      console.error('Authentication failed. Please check your Crystallize access token credentials.');
+    }
+    
+    // Check if it's a permission error
+    if (error.message?.includes('403') || error.message?.includes('Forbidden')) {
+      console.error('Permission denied. Please ensure your access token has the necessary permissions to update product variants.');
+    }
+    
     return false;
+  }
+}
+
+/**
+ * Batch update multiple variants with their Stripe price IDs
+ * @param {Array} updates - Array of {productId, variantId, stripePriceId} objects
+ * @returns {Promise<Object>} - Results object with success/failure counts
+ */
+export async function batchUpdateVariantStripePriceIds(updates) {
+  const results = {
+    successful: 0,
+    failed: 0,
+    errors: []
+  };
+
+  for (const update of updates) {
+    try {
+      const success = await updateVariantStripePriceId(
+        update.productId, 
+        update.variantId, 
+        update.stripePriceId
+      );
+      
+      if (success) {
+        results.successful++;
+      } else {
+        results.failed++;
+        results.errors.push(`Failed to update variant ${update.variantId}`);
+      }
+    } catch (error) {
+      results.failed++;
+      results.errors.push(`Error updating variant ${update.variantId}: ${error.message}`);
+    }
+  }
+
+  console.log(`Batch update completed: ${results.successful} successful, ${results.failed} failed`);
+  
+  if (results.errors.length > 0) {
+    console.error('Batch update errors:', results.errors);
+  }
+
+  return results;
+}
+
+/**
+ * Get a product variant by its ID
+ * @param {string} productId - Crystallize product ID
+ * @param {string} variantId - Crystallize variant ID
+ * @returns {Promise<Object|null>} - The variant object or null if not found
+ */
+export async function getProductVariant(productId, variantId) {
+  try {
+    if (import.meta.env.DEV && !import.meta.env.CRYSTALLIZE_TENANT_ID) {
+      // Return demo variant for development
+      const demoProducts = getDemoProducts();
+      for (const product of demoProducts) {
+        const variant = product.fields.variants.find(v => v.id === variantId);
+        if (variant) {
+          return { ...variant, productId: product.sys.id };
+        }
+      }
+      return null;
+    }
+
+    const query = `
+      query GetProductVariant($productId: ID!, $variantId: ID!, $language: String!) {
+        catalogue(id: $productId, language: $language) {
+          ... on Product {
+            variants {
+              id
+              name
+              sku
+              price
+              priceVariants {
+                identifier
+                price
+                currency
+              }
+              attributes {
+                attribute
+                value
+              }
+              externalReference
+            }
+          }
+        }
+      }
+    `;
+
+    const variables = {
+      productId: productId,
+      variantId: variantId,
+      language: 'en',
+    };
+
+    const response = await client.catalogueApi(query, variables);
+    
+    if (!response.data?.catalogue?.variants) {
+      return null;
+    }
+
+    const variant = response.data.catalogue.variants.find(v => v.id === variantId);
+    
+    if (!variant) {
+      return null;
+    }
+
+    // Transform variant attributes
+    const variantAttributes = {};
+    if (variant.attributes) {
+      variant.attributes.forEach(attr => {
+        variantAttributes[attr.attribute] = attr.value;
+      });
+    }
+
+    return {
+      id: variant.id,
+      name: variant.name,
+      sku: variant.sku,
+      size: variantAttributes.size || '12oz',
+      grind: variantAttributes.grind || 'whole-bean',
+      price: variant.price || 0,
+      priceVariants: variant.priceVariants || [],
+      stripe_price_id: variant.externalReference || null,
+      productId: productId,
+    };
+
+  } catch (error) {
+    console.error('Error fetching product variant:', error);
+    return null;
   }
 }
 
