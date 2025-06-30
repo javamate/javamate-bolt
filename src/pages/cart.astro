@@ -58,9 +58,37 @@ import Layout from '../layouts/Layout.astro';
                     <span id="subtotal">$0.00</span>
                   </div>
                   
+                  <!-- Shipping Options -->
+                  <div class="border-t border-primary-200 pt-4">
+                    <h4 class="font-medium text-primary-900 mb-3">Shipping Options</h4>
+                    <div class="space-y-3">
+                      <label class="flex items-center justify-between p-3 border border-primary-200 rounded-lg cursor-pointer hover:bg-primary-50 transition-colors">
+                        <div class="flex items-center">
+                          <input type="radio" name="shipping" value="standard" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300" checked>
+                          <div class="ml-3">
+                            <div class="font-medium text-primary-900">Standard Shipping</div>
+                            <div class="text-sm text-primary-600">3-7 business days</div>
+                          </div>
+                        </div>
+                        <span class="font-semibold text-primary-900">$6.99</span>
+                      </label>
+                      
+                      <label class="flex items-center justify-between p-3 border border-primary-200 rounded-lg cursor-pointer hover:bg-primary-50 transition-colors">
+                        <div class="flex items-center">
+                          <input type="radio" name="shipping" value="expedited" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300">
+                          <div class="ml-3">
+                            <div class="font-medium text-primary-900">Expedited Shipping</div>
+                            <div class="text-sm text-primary-600">1-3 business days</div>
+                          </div>
+                        </div>
+                        <span class="font-semibold text-primary-900">$9.99</span>
+                      </label>
+                    </div>
+                  </div>
+                  
                   <div class="flex justify-between">
                     <span>Shipping</span>
-                    <span id="shipping-cost" class="text-success-600 font-medium">FREE</span>
+                    <span id="shipping-cost" class="font-medium">$6.99</span>
                   </div>
                   
                   <div class="flex justify-between text-sm text-primary-600">
@@ -128,22 +156,23 @@ import Layout from '../layouts/Layout.astro';
                 <h4 class="font-semibold mb-4">Shipping Information</h4>
                 <div class="space-y-3 text-sm">
                   <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-success-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span>Free shipping on orders over $25</span>
+                    <span>US shipping only</span>
                   </div>
                   <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-success-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
                     <span>Roasted fresh and shipped within 24 hours</span>
                   </div>
                   <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-success-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Delivery in 2-5 business days</span>
+                    <span>Standard: 3-7 days | Expedited: 1-3 days</span>
                   </div>
                 </div>
               </div>
@@ -166,6 +195,7 @@ import Layout from '../layouts/Layout.astro';
   class CartManager {
     constructor() {
       this.cart = this.loadCart();
+      this.selectedShipping = 'standard'; // Default to standard shipping
       this.init();
     }
     
@@ -259,11 +289,11 @@ import Layout from '../layouts/Layout.astro';
     }
     
     getTax() {
-      return 0; // this.getSubtotal() * 0.08; // 8% tax rate
+      return 0; // No tax for now
     }
     
     getShipping() {
-      return this.getSubtotal() >= 25 ? 0 : 5.99;
+      return this.selectedShipping === 'expedited' ? 9.99 : 6.99;
     }
     
     getTotal() {
@@ -371,10 +401,7 @@ import Layout from '../layouts/Layout.astro';
       
       if (itemCount) itemCount.textContent = totalItems.toString();
       if (subtotal) subtotal.textContent = `$${subtotalAmount.toFixed(2)}`;
-      if (shippingCost) {
-        shippingCost.textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
-        shippingCost.className = shipping === 0 ? 'text-success-600 font-medium' : '';
-      }
+      if (shippingCost) shippingCost.textContent = `$${shipping.toFixed(2)}`;
       if (taxAmount) taxAmount.textContent = `$${tax.toFixed(2)}`;
       if (totalAmount) totalAmount.textContent = `$${total.toFixed(2)}`;
     }
@@ -392,6 +419,14 @@ import Layout from '../layouts/Layout.astro';
     }
     
     bindEvents() {
+      // Shipping option change
+      document.addEventListener('change', (e) => {
+        if (e.target.name === 'shipping') {
+          this.selectedShipping = e.target.value;
+          this.updateSummary();
+        }
+      });
+
       // Quantity buttons
       document.addEventListener('click', (e) => {
         if (e.target.closest('.quantity-btn')) {
@@ -537,7 +572,7 @@ import Layout from '../layouts/Layout.astro';
             line_items: lineItems,
             mode: 'payment',
             success_url: `${window.location.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${window.location.origin}/cart`,
+            cancel_url: `${window.location.origin}/cart?checkout=cancelled`,
           }),
         });
 
@@ -660,5 +695,15 @@ import Layout from '../layouts/Layout.astro';
   
   .quantity-input[type=number] {
     -moz-appearance: textfield;
+  }
+
+  /* Radio button styling */
+  input[type="radio"]:checked + div {
+    color: #7D5935;
+  }
+
+  label:has(input[type="radio"]:checked) {
+    border-color: #B78B5E;
+    background-color: #FAF6F1;
   }
 </style>
