@@ -100,18 +100,14 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script type="module">
-  import { createClient } from '@supabase/supabase-js';
-
-  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  import { supabase } from '../lib/supabaseClient.js';
 
   document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('login-form') as HTMLFormElement;
-    const button = document.getElementById('login-button') as HTMLButtonElement;
-    const messageDiv = document.getElementById('login-message') as HTMLDivElement;
+    const form = document.getElementById('login-form');
+    const button = document.getElementById('login-button');
+    const messageDiv = document.getElementById('login-message');
 
-    function showMessage(message: string, type: 'success' | 'error') {
+    function showMessage(message, type) {
       messageDiv.textContent = message;
       messageDiv.className = `p-4 rounded-md ${
         type === 'success' 
@@ -130,8 +126,8 @@ import Layout from '../layouts/Layout.astro';
       hideMessage();
 
       const formData = new FormData(form);
-      const email = formData.get('email') as string;
-      const password = formData.get('password') as string;
+      const email = formData.get('email');
+      const password = formData.get('password');
 
       if (!email || !password) {
         showMessage('Please fill in all fields', 'error');
@@ -159,7 +155,7 @@ import Layout from '../layouts/Layout.astro';
             window.location.href = '/dashboard';
           }, 1500);
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Login error:', error);
         showMessage(error.message || 'An error occurred during sign in', 'error');
       } finally {
