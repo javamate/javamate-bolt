@@ -2,7 +2,7 @@
 import { Icon } from 'astro-icon/components';
 ---
 
-<header class="sticky top-0 z-50 w-full transition-all duration-300" id="site-header">
+<header class="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-white/95 backdrop-blur-sm shadow-sm" id="site-header">
   <div class="container-custom py-4 flex items-center justify-between">
     <a href="/" class="flex items-center space-x-2">
       <img src="/images/logo.svg" alt="Javamate Coffee Roasters" width="40" height="40" class="w-10 h-10" />
@@ -68,6 +68,9 @@ import { Icon } from 'astro-icon/components';
   </div>
 </header>
 
+<!-- Spacer to prevent content from hiding behind fixed header -->
+<div class="h-20"></div>
+
 <script>
   import { createClient } from '@supabase/supabase-js';
 
@@ -79,23 +82,46 @@ import { Icon } from 'astro-icon/components';
     // Header scroll behavior
     const header = document.getElementById('site-header');
     let lastScrollY = window.scrollY;
+    let ticking = false;
 
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 100) {
-        header.classList.add('bg-white', 'shadow-sm');
+    function updateHeader() {
+      const currentScrollY = window.scrollY;
+      
+      // Add enhanced background when scrolled
+      if (currentScrollY > 20) {
+        header.classList.add('bg-white/98', 'shadow-md');
+        header.classList.remove('bg-white/95', 'shadow-sm');
       } else {
-        header.classList.remove('bg-white', 'shadow-sm');
+        header.classList.add('bg-white/95', 'shadow-sm');
+        header.classList.remove('bg-white/98', 'shadow-md');
       }
       
-      // Hide on scroll down, show on scroll up
-      if (window.scrollY > lastScrollY) {
-        header.classList.add('-translate-y-full');
+      // Hide/show header based on scroll direction (optional - can be removed if always visible is preferred)
+      if (currentScrollY > 100) {
+        if (currentScrollY > lastScrollY) {
+          // Scrolling down - hide header
+          header.style.transform = 'translateY(-100%)';
+        } else {
+          // Scrolling up - show header
+          header.style.transform = 'translateY(0)';
+        }
       } else {
-        header.classList.remove('-translate-y-full');
+        // Always show header when near top
+        header.style.transform = 'translateY(0)';
       }
       
-      lastScrollY = window.scrollY;
-    });
+      lastScrollY = currentScrollY;
+      ticking = false;
+    }
+
+    function requestTick() {
+      if (!ticking) {
+        requestAnimationFrame(updateHeader);
+        ticking = true;
+      }
+    }
+
+    window.addEventListener('scroll', requestTick, { passive: true });
     
     // Mobile menu toggle
     const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
@@ -110,6 +136,15 @@ import { Icon } from 'astro-icon/components';
     mobileMenuClose.addEventListener('click', () => {
       mobileMenu.classList.add('translate-x-full');
       document.body.classList.remove('overflow-hidden');
+    });
+
+    // Close mobile menu when clicking on nav links
+    const mobileNavLinks = mobileMenu.querySelectorAll('nav a');
+    mobileNavLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+      });
     });
 
     // Auth state management
@@ -180,3 +215,24 @@ import { Icon } from 'astro-icon/components';
     }
   });
 </script>
+
+<style>
+  /* Ensure smooth transitions for the sticky header */
+  #site-header {
+    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+  
+  /* Ensure the backdrop blur works properly */
+  @supports (backdrop-filter: blur(12px)) {
+    #site-header {
+      backdrop-filter: blur(12px);
+    }
+  }
+  
+  /* Fallback for browsers that don't support backdrop-filter */
+  @supports not (backdrop-filter: blur(12px)) {
+    #site-header {
+      background-color: rgba(255, 255, 255, 0.98);
+    }
+  }
+</style>
