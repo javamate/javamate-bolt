@@ -170,12 +170,31 @@ import Layout from '../layouts/Layout.astro';
         return;
       }
 
+      // Clear the cart now that payment is successful
+      clearCartAfterSuccessfulPayment();
+      
       // Try to find the order in our database
       await loadOrderDetails(sessionId);
       
     } catch (error) {
       console.error('Error loading success page:', error);
       showError();
+    }
+
+    function clearCartAfterSuccessfulPayment() {
+      try {
+        // Clear the cart from localStorage
+        localStorage.removeItem('javamate-cart');
+        localStorage.setItem('cartCount', '0');
+        
+        // Clear any checkout-related session storage
+        sessionStorage.removeItem('checkout-cart-backup');
+        sessionStorage.removeItem('pending-checkout-session');
+        
+        console.log('Cart cleared after successful payment');
+      } catch (error) {
+        console.error('Error clearing cart after payment:', error);
+      }
     }
 
     function showError() {
@@ -224,14 +243,14 @@ import Layout from '../layouts/Layout.astro';
       
       // Try to get product name from our config
       // Note: We don't have price_id in orders table, so we'll show a generic name
-      document.getElementById('product-name').textContent = 'Organic Peru SWP Decaf';
+      document.getElementById('product-name').textContent = 'Coffee Purchase';
     }
 
     function showGenericSuccess(sessionId) {
       // Show success page with generic details
       document.getElementById('order-id').textContent = sessionId.substring(0, 8).toUpperCase();
       document.getElementById('product-name').textContent = 'Coffee Purchase';
-      document.getElementById('amount').textContent = '$20.00';
+      document.getElementById('amount').textContent = 'Processing...';
       showSuccess();
     }
   });
