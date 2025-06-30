@@ -6,7 +6,6 @@ const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPAB
 const CRYSTALLIZE_TENANT_ID = Deno.env.get('CRYSTALLIZE_TENANT_ID');
 const CRYSTALLIZE_ACCESS_TOKEN_ID = Deno.env.get('CRYSTALLIZE_ACCESS_TOKEN_ID');
 const CRYSTALLIZE_ACCESS_TOKEN_SECRET = Deno.env.get('CRYSTALLIZE_ACCESS_TOKEN_SECRET');
-const CRYSTALLIZE_API_URL = `https://pim.crystallize.com/graphql/${CRYSTALLIZE_TENANT_ID}`;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -129,6 +128,20 @@ Deno.serve(async (req) => {
 
 async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<string | null> {
   try {
+    // Validate tenant ID format
+    if (!CRYSTALLIZE_TENANT_ID || CRYSTALLIZE_TENANT_ID.length < 3) {
+      throw new Error('Invalid Crystallize tenant ID');
+    }
+
+    // Construct the correct API URL - try both PIM and Catalogue API endpoints
+    const pimApiUrl = `https://pim.crystallize.com/graphql/${CRYSTALLIZE_TENANT_ID}`;
+    const catalogueApiUrl = `https://api.crystallize.com/${CRYSTALLIZE_TENANT_ID}/catalogue`;
+    
+    // For order creation, we should use the PIM API
+    const apiUrl = pimApiUrl;
+
+    console.log('Using Crystallize API URL:', apiUrl);
+
     // Prepare line items for Crystallize
     const crystallizeLineItems = orderData.lineItems.map(item => ({
       name: `${item.productName} - ${item.size} ${item.grind === 'whole-bean' ? 'Whole Bean' : item.grind}`,
@@ -136,7 +149,7 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
       quantity: item.quantity,
       price: {
         gross: item.unitPrice,
-        net: item.unitPrice, // Assuming no tax for now
+        net: item.unitPrice,
         currency: orderData.currency.toUpperCase(),
         tax: {
           name: 'No Tax',
@@ -160,10 +173,12 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
     }));
 
     // Prepare customer information
+    const customerName = orderData.customerName || 'Customer';
+    const nameParts = customerName.split(' ');
     const customer = {
       identifier: orderData.customerId,
-      firstName: orderData.customerName?.split(' ')[0] || 'Customer',
-      lastName: orderData.customerName?.split(' ').slice(1).join(' ') || '',
+      firstName: nameParts[0] || 'Customer',
+      lastName: nameParts.slice(1).join(' ') || '',
       email: orderData.customerEmail,
       phone: orderData.customerPhone || '',
       addresses: orderData.shippingAddress ? [{
@@ -252,40 +267,79 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
       ]
     };
 
-    // Create authentication header
-    const authHeader = `Bearer ${CRYSTALLIZE_ACCESS_TOKEN_ID}:${CRYSTALLIZE_ACCESS_TOKEN_SECRET}`;
+    // Prepare authentication - try multiple authentication methods
+    const authHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Javamate-Coffee-Integration/1.0',
+    };
+
+    // Method 1: Bearer token
+    const bearerToken = `${CRYSTALLIZE_ACCESS_TOKEN_ID}:${CRYSTALLIZE_ACCESS_TOKEN_SECRET}`;
+    authHeaders['Authorization'] = `Bearer ${bearerToken}`;
+
+    // Method 2: Custom headers (fallback)
+    authHeaders['X-Crystallize-Access-Token-ID'] = CRYSTALLIZE_ACCESS_TOKEN_ID;
+    authHeaders['X-Crystallize-Access-Token-Secret'] = CRYSTALLIZE_ACCESS_TOKEN_SECRET;
+
+    const requestBody = {
+      query: createOrderMutation,
+      variables: {
+        input: orderInput
+      }
+    };
 
     console.log('Sending order to Crystallize:', {
-      url: CRYSTALLIZE_API_URL,
+      url: apiUrl,
       customer: customer.email,
       total: orderData.total,
-      lineItems: crystallizeLineItems.length
+      lineItems: crystallizeLineItems.length,
+      tenantId: CRYSTALLIZE_TENANT_ID
     });
 
-    // Send request to Crystallize
-    const response = await fetch(CRYSTALLIZE_API_URL, {
+    // Send request to Crystallize with improved error handling
+    const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json',
-        'X-Crystallize-Access-Token-ID': CRYSTALLIZE_ACCESS_TOKEN_ID,
-        'X-Crystallize-Access-Token-Secret': CRYSTALLIZE_ACCESS_TOKEN_SECRET
-      },
-      body: JSON.stringify({
-        query: createOrderMutation,
-        variables: {
-          input: orderInput
-        }
-      })
+      headers: authHeaders,
+      body: JSON.stringify(requestBody)
     });
+
+    console.log('Crystallize API response status:', response.status);
+    console.log('Crystallize API response headers:', Object.fromEntries(response.headers.entries()));
+
+    // Get response text first to handle both JSON and HTML responses
+    const responseText = await response.text();
+    console.log('Crystallize API raw response (first 500 chars):', responseText.substring(0, 500));
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Crystallize API error:', response.status, errorText);
-      throw new Error(`Crystallize API error: ${response.status} - ${errorText}`);
+      // Check if response is HTML (error page)
+      if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+        console.error('Crystallize API returned HTML error page instead of JSON');
+        
+        // Extract error information from HTML if possible
+        const titleMatch = responseText.match(/<title>(.*?)<\/title>/i);
+        const errorTitle = titleMatch ? titleMatch[1] : 'Unknown error';
+        
+        throw new Error(`Crystallize API error (${response.status}): ${errorTitle}. This usually indicates an authentication or endpoint issue.`);
+      }
+      
+      // Try to parse as JSON error
+      try {
+        const errorData = JSON.parse(responseText);
+        throw new Error(`Crystallize API error (${response.status}): ${JSON.stringify(errorData)}`);
+      } catch (parseError) {
+        throw new Error(`Crystallize API error (${response.status}): ${responseText}`);
+      }
     }
 
-    const result = await response.json();
+    // Parse JSON response
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse Crystallize response as JSON:', parseError);
+      console.error('Response text:', responseText);
+      throw new Error('Crystallize API returned invalid JSON response');
+    }
 
     if (result.errors) {
       console.error('Crystallize GraphQL errors:', result.errors);
@@ -294,7 +348,7 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
 
     if (!result.data?.order?.create?.id) {
       console.error('Unexpected Crystallize response structure:', result);
-      throw new Error('Unexpected response structure from Crystallize');
+      throw new Error('Unexpected response structure from Crystallize - order creation may have failed');
     }
 
     const crystallizeOrderId = result.data.order.create.id;
@@ -305,15 +359,27 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
   } catch (error) {
     console.error('Error creating Crystallize order:', error);
     
-    // Check for specific error types
+    // Provide more specific error messages based on common issues
     if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
       console.error('Authentication failed with Crystallize. Please check your access token credentials.');
+      throw new Error('Crystallize authentication failed. Please verify your access token credentials.');
     }
     
     if (error.message?.includes('403') || error.message?.includes('Forbidden')) {
       console.error('Permission denied by Crystallize. Please ensure your access token has the necessary permissions.');
+      throw new Error('Crystallize permission denied. Please ensure your access token has order creation permissions.');
     }
     
+    if (error.message?.includes('404') || error.message?.includes('Not Found')) {
+      console.error('Crystallize API endpoint not found. Please check your tenant ID.');
+      throw new Error('Crystallize API endpoint not found. Please verify your tenant ID is correct.');
+    }
+    
+    if (error.message?.includes('<!DOCTYPE')) {
+      throw new Error('Crystallize API returned an HTML error page instead of JSON. This usually indicates an authentication or configuration issue.');
+    }
+    
+    // Re-throw the original error if it's already descriptive
     throw error;
   }
 }
