@@ -223,6 +223,8 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
       payment: [{
         provider: 'stripe',
         stripe: {
+          orderId: orderData.orderId,
+          customerId: orderData.customerId,
           paymentIntentId: orderData.paymentIntentId,
           paymentMethod: 'card'
         }
@@ -261,33 +263,6 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
         orders {
           create(input: $input) {
             id
-            createdAt
-            updatedAt
-            total {
-              gross
-              net
-              currency
-            }
-            customer {
-              identifier
-              email
-              firstName
-              lastName
-            }
-            cart {
-              name
-              sku
-              quantity
-              price {
-                gross
-                net
-                currency
-              }
-            }
-            meta {
-              key
-              value
-            }
           }
         }
       }
