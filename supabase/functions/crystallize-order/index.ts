@@ -47,35 +47,26 @@ interface CrystallizeOrderData {
   orderDate: string;
 }
 
-// Initialize Crystallize clients
+// Initialize Crystallize client
 let catalogueClient: any = null;
-let pimClient: any = null;
 
-function initializeCrystallizeClients() {
+function initializeCrystallizeClient() {
   if (!CRYSTALLIZE_TENANT_ID || !CRYSTALLIZE_ACCESS_TOKEN_ID || !CRYSTALLIZE_ACCESS_TOKEN_SECRET) {
     throw new Error('Crystallize credentials not configured');
   }
 
   try {
-    // Catalogue API client (for reading data)
+    // Catalogue API client (for reading data and creating orders via orderApi)
     catalogueClient = createCrystallizeClient({
       tenantIdentifier: CRYSTALLIZE_TENANT_ID,
       accessTokenId: CRYSTALLIZE_ACCESS_TOKEN_ID,
       accessTokenSecret: CRYSTALLIZE_ACCESS_TOKEN_SECRET,
     });
 
-    // PIM API client (for creating orders)
-    pimClient = createCrystallizeClient({
-      tenantIdentifier: CRYSTALLIZE_TENANT_ID,
-      accessTokenId: CRYSTALLIZE_ACCESS_TOKEN_ID,
-      accessTokenSecret: CRYSTALLIZE_ACCESS_TOKEN_SECRET,
-      origin: 'https://pim.crystallize.com',
-    });
-
-    console.log(`Initialized Crystallize clients for tenant: ${CRYSTALLIZE_TENANT_ID}`);
+    console.log(`Initialized Crystallize catalogue client for tenant: ${CRYSTALLIZE_TENANT_ID}`);
   } catch (error) {
-    console.error('Failed to initialize Crystallize clients:', error);
-    throw new Error(`Failed to initialize Crystallize clients: ${error.message}`);
+    console.error('Failed to initialize Crystallize client:', error);
+    throw new Error(`Failed to initialize Crystallize client: ${error.message}`);
   }
 }
 
@@ -96,8 +87,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Initialize Crystallize clients
-    initializeCrystallizeClients();
+    // Initialize Crystallize client
+    initializeCrystallizeClient();
 
     const orderData: CrystallizeOrderData = await req.json();
 
@@ -114,7 +105,7 @@ Deno.serve(async (req) => {
 
     console.log(`Processing order ${orderData.orderId} for Crystallize integration`);
 
-    // Create Crystallize order
+    // Create Crystallize order using orderApi
     const crystallizeOrderId = await createCrystallizeOrder(orderData);
 
     if (!crystallizeOrderId) {
@@ -153,7 +144,7 @@ Deno.serve(async (req) => {
 
 async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<string | null> {
   try {
-    console.log('Creating Crystallize order with JS API client');
+    console.log('Creating Crystallize order using orderApi on catalogueClient');
 
     // Prepare customer information
     const customerName = orderData.customerName || 'Customer';
@@ -302,19 +293,19 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
       }
     `;
 
-    console.log('Sending order to Crystallize PIM API:', {
+    console.log('Sending order to Crystallize using orderApi:', {
       customer: customer.email,
       total: orderData.total,
       lineItems: cart.length,
       tenantId: CRYSTALLIZE_TENANT_ID
     });
 
-    // Use the PIM API client to create the order
-    const response = await pimClient.pimApi(createOrderMutation, {
+    // Use the orderApi function on the catalogueClient to create the order
+    const response = await catalogueClient.orderApi(createOrderMutation, {
       input: orderInput
     });
 
-    console.log('Crystallize PIM API response received');
+    console.log('Crystallize orderApi response received');
 
     // Check for GraphQL errors
     if (response.errors && response.errors.length > 0) {
@@ -334,7 +325,7 @@ async function createCrystallizeOrder(orderData: CrystallizeOrderData): Promise<
     const crystallizeOrderId = response.data.order.create.id;
     const createdOrder = response.data.order.create;
 
-    console.log(`Successfully created Crystallize order:`, {
+    console.log(`Successfully created Crystallize order using orderApi:`, {
       id: crystallizeOrderId,
       customer: createdOrder.customer?.email,
       total: createdOrder.total?.gross,
