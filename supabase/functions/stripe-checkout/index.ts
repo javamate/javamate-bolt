@@ -43,20 +43,45 @@ Deno.serve(async (req) => {
       return corsResponse({ error: 'Method not allowed' }, 405);
     }
 
-    const { price_id, success_url, cancel_url, mode } = await req.json();
+    const requestBody = await req.json();
+    
+    // Handle both single item and line items formats
+    let lineItems = [];
+    let mode = 'payment';
+    let successUrl = '';
+    let cancelUrl = '';
 
-    const error = validateParameters(
-      { price_id, success_url, cancel_url, mode },
-      {
-        cancel_url: 'string',
-        price_id: 'string',
-        success_url: 'string',
-        mode: { values: ['payment', 'subscription'] },
-      },
-    );
+    if (requestBody.line_items) {
+      // New format with line items
+      lineItems = requestBody.line_items;
+      mode = requestBody.mode || 'payment';
+      successUrl = requestBody.success_url;
+      cancelUrl = requestBody.cancel_url;
+    } else if (requestBody.price_id) {
+      // Legacy format with single price_id
+      lineItems = [{
+        price: requestBody.price_id,
+        quantity: 1,
+      }];
+      mode = requestBody.mode || 'payment';
+      successUrl = requestBody.success_url;
+      cancelUrl = requestBody.cancel_url;
+    } else {
+      return corsResponse({ error: 'Missing required parameters: either line_items or price_id must be provided' }, 400);
+    }
 
-    if (error) {
-      return corsResponse({ error }, 400);
+    // Validate required parameters
+    if (!successUrl || !cancelUrl) {
+      return corsResponse({ error: 'Missing required parameters: success_url and cancel_url are required' }, 400);
+    }
+
+    if (!lineItems || lineItems.length === 0) {
+      return corsResponse({ error: 'At least one line item is required' }, 400);
+    }
+
+    // Validate mode
+    if (!['payment', 'subscription'].includes(mode)) {
+      return corsResponse({ error: 'Invalid mode. Must be either "payment" or "subscription"' }, 400);
     }
 
     const authHeader = req.headers.get('Authorization')!;
@@ -83,7 +108,6 @@ Deno.serve(async (req) => {
 
     if (getCustomerError) {
       console.error('Failed to fetch customer information from the database', getCustomerError);
-
       return corsResponse({ error: 'Failed to fetch customer information' }, 500);
     }
 
@@ -157,7 +181,6 @@ Deno.serve(async (req) => {
 
         if (getSubscriptionError) {
           console.error('Failed to fetch subscription information from the database', getSubscriptionError);
-
           return corsResponse({ error: 'Failed to fetch subscription information' }, 500);
         }
 
@@ -170,29 +193,27 @@ Deno.serve(async (req) => {
 
           if (createSubscriptionError) {
             console.error('Failed to create subscription record for existing customer', createSubscriptionError);
-
             return corsResponse({ error: 'Failed to create subscription record for existing customer' }, 500);
           }
         }
       }
     }
 
-    // create Checkout Session
+    // Create Checkout Session with line items
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price: price_id,
-          quantity: 1,
-        },
-      ],
+      line_items: lineItems,
       mode,
-      success_url,
-      cancel_url,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        user_id: user.id,
+        line_items_count: lineItems.length.toString(),
+      },
     });
 
-    console.log(`Created checkout session ${session.id} for customer ${customerId}`);
+    console.log(`Created checkout session ${session.id} for customer ${customerId} with ${lineItems.length} line items`);
 
     return corsResponse({ sessionId: session.id, url: session.url });
   } catch (error: any) {
@@ -200,28 +221,3 @@ Deno.serve(async (req) => {
     return corsResponse({ error: error.message }, 500);
   }
 });
-
-type ExpectedType = 'string' | { values: string[] };
-type Expectations<T> = { [K in keyof T]: ExpectedType };
-
-function validateParameters<T extends Record<string, any>>(values: T, expected: Expectations<T>): string | undefined {
-  for (const parameter in values) {
-    const expectation = expected[parameter];
-    const value = values[parameter];
-
-    if (expectation === 'string') {
-      if (value == null) {
-        return `Missing required parameter ${parameter}`;
-      }
-      if (typeof value !== 'string') {
-        return `Expected parameter ${parameter} to be a string got ${JSON.stringify(value)}`;
-      }
-    } else {
-      if (!expectation.values.includes(value)) {
-        return `Expected parameter ${parameter} to be one of ${expectation.values.join(', ')}`;
-      }
-    }
-  }
-
-  return undefined;
-}
