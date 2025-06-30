@@ -132,86 +132,6 @@
           }
         }
       ]
-    },
-    {
-      "identifier": "coffee-variant",
-      "name": "Coffee Variant",
-      "type": "productVariant",
-      "components": [
-        {
-          "id": "name",
-          "name": "Variant Name",
-          "type": "singleLine",
-          "required": true
-        },
-        {
-          "id": "sku",
-          "name": "SKU",
-          "type": "singleLine",
-          "required": true
-        },
-        {
-          "id": "size",
-          "name": "Bag Size",
-          "type": "selection",
-          "config": {
-            "options": [
-              { "key": "8oz", "value": "8oz" },
-              { "key": "12oz", "value": "12oz" },
-              { "key": "16oz", "value": "1lb (16oz)" },
-              { "key": "2lb", "value": "2lb" },
-              { "key": "5lb", "value": "5lb" }
-            ]
-          },
-          "required": true
-        },
-        {
-          "id": "grind",
-          "name": "Grind Type",
-          "type": "selection",
-          "config": {
-            "options": [
-              { "key": "whole-bean", "value": "Whole Bean" },
-              { "key": "coarse", "value": "Coarse (French Press)" },
-              { "key": "medium-coarse", "value": "Medium-Coarse (Pour Over)" },
-              { "key": "medium", "value": "Medium (Drip Coffee)" },
-              { "key": "medium-fine", "value": "Medium-Fine (V60)" },
-              { "key": "fine", "value": "Fine (Espresso)" }
-            ]
-          },
-          "required": true
-        },
-        {
-          "id": "price",
-          "name": "Price",
-          "type": "numeric",
-          "config": {
-            "decimalPlaces": 2
-          },
-          "required": true
-        },
-        {
-          "id": "stock",
-          "name": "Stock Quantity",
-          "type": "numeric",
-          "config": {
-            "decimalPlaces": 0
-          }
-        },
-        {
-          "id": "weight",
-          "name": "Weight (grams)",
-          "type": "numeric",
-          "config": {
-            "decimalPlaces": 0
-          }
-        },
-        {
-          "id": "stripe-price-id",
-          "name": "Stripe Price ID",
-          "type": "singleLine"
-        }
-      ]
     }
   ],
   "products": [
@@ -251,36 +171,68 @@
         {
           "name": "Ethiopian Yirgacheffe - 12oz Whole Bean",
           "sku": "ETH-YIR-12-WB",
-          "size": "12oz",
-          "grind": "whole-bean",
-          "price": 16.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 16.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 100,
           "weight": 340
         },
         {
           "name": "Ethiopian Yirgacheffe - 12oz Medium Grind",
           "sku": "ETH-YIR-12-MED",
-          "size": "12oz",
-          "grind": "medium",
-          "price": 16.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 16.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 75,
           "weight": 340
         },
         {
           "name": "Ethiopian Yirgacheffe - 16oz Whole Bean",
           "sku": "ETH-YIR-16-WB",
-          "size": "16oz",
-          "grind": "whole-bean",
-          "price": 21.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 21.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 80,
           "weight": 454
         },
         {
           "name": "Ethiopian Yirgacheffe - 16oz Medium Grind",
           "sku": "ETH-YIR-16-MED",
-          "size": "16oz",
-          "grind": "medium",
-          "price": 21.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 21.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 60,
           "weight": 454
         }
@@ -322,36 +274,68 @@
         {
           "name": "Colombian Supremo - 12oz Whole Bean",
           "sku": "COL-SUP-12-WB",
-          "size": "12oz",
-          "grind": "whole-bean",
-          "price": 15.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 15.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 120,
           "weight": 340
         },
         {
           "name": "Colombian Supremo - 12oz Medium Grind",
           "sku": "COL-SUP-12-MED",
-          "size": "12oz",
-          "grind": "medium",
-          "price": 15.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 15.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 90,
           "weight": 340
         },
         {
           "name": "Colombian Supremo - 16oz Whole Bean",
           "sku": "COL-SUP-16-WB",
-          "size": "16oz",
-          "grind": "whole-bean",
-          "price": 20.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 20.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 100,
           "weight": 454
         },
         {
           "name": "Colombian Supremo - 16oz Medium Grind",
           "sku": "COL-SUP-16-MED",
-          "size": "16oz",
-          "grind": "medium",
-          "price": 20.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 20.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 70,
           "weight": 454
         }
@@ -393,36 +377,68 @@
         {
           "name": "Guatemala Antigua - 12oz Whole Bean",
           "sku": "GUA-ANT-12-WB",
-          "size": "12oz",
-          "grind": "whole-bean",
-          "price": 17.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 17.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 85,
           "weight": 340
         },
         {
           "name": "Guatemala Antigua - 12oz Medium Grind",
           "sku": "GUA-ANT-12-MED",
-          "size": "12oz",
-          "grind": "medium",
-          "price": 17.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 17.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 65,
           "weight": 340
         },
         {
           "name": "Guatemala Antigua - 16oz Whole Bean",
           "sku": "GUA-ANT-16-WB",
-          "size": "16oz",
-          "grind": "whole-bean",
-          "price": 22.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 22.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 70,
           "weight": 454
         },
         {
           "name": "Guatemala Antigua - 16oz Medium Grind",
           "sku": "GUA-ANT-16-MED",
-          "size": "16oz",
-          "grind": "medium",
-          "price": 22.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 22.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 50,
           "weight": 454
         }
@@ -464,36 +480,68 @@
         {
           "name": "Sumatra Mandheling - 12oz Whole Bean",
           "sku": "SUM-MAN-12-WB",
-          "size": "12oz",
-          "grind": "whole-bean",
-          "price": 18.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 18.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 75,
           "weight": 340
         },
         {
           "name": "Sumatra Mandheling - 12oz Medium Grind",
           "sku": "SUM-MAN-12-MED",
-          "size": "12oz",
-          "grind": "medium",
-          "price": 18.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 18.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 55,
           "weight": 340
         },
         {
           "name": "Sumatra Mandheling - 16oz Whole Bean",
           "sku": "SUM-MAN-16-WB",
-          "size": "16oz",
-          "grind": "whole-bean",
-          "price": 23.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 23.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 60,
           "weight": 454
         },
         {
           "name": "Sumatra Mandheling - 16oz Medium Grind",
           "sku": "SUM-MAN-16-MED",
-          "size": "16oz",
-          "grind": "medium",
-          "price": 23.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 23.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 40,
           "weight": 454
         }
@@ -535,37 +583,69 @@
         {
           "name": "Organic Peru SWP Decaf - 12oz Whole Bean",
           "sku": "PER-DEC-12-WB",
-          "size": "12oz",
-          "grind": "whole-bean",
-          "price": 19.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 19.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 50,
           "weight": 340,
-          "stripe-price-id": "price_1RKgo2R1hBQXgqR7RYvtL02O"
+          "externalReference": "price_1RKgo2R1hBQXgqR7RYvtL02O"
         },
         {
           "name": "Organic Peru SWP Decaf - 12oz Medium Grind",
           "sku": "PER-DEC-12-MED",
-          "size": "12oz",
-          "grind": "medium",
-          "price": 19.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 19.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 40,
           "weight": 340
         },
         {
           "name": "Organic Peru SWP Decaf - 16oz Whole Bean",
           "sku": "PER-DEC-16-WB",
-          "size": "16oz",
-          "grind": "whole-bean",
-          "price": 24.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 24.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 35,
           "weight": 454
         },
         {
           "name": "Organic Peru SWP Decaf - 16oz Medium Grind",
           "sku": "PER-DEC-16-MED",
-          "size": "16oz",
-          "grind": "medium",
-          "price": 24.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 24.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 25,
           "weight": 454
         }
@@ -607,45 +687,85 @@
         {
           "name": "Javamate House Blend - 12oz Whole Bean",
           "sku": "HOU-BLE-12-WB",
-          "size": "12oz",
-          "grind": "whole-bean",
-          "price": 14.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 14.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 150,
           "weight": 340
         },
         {
           "name": "Javamate House Blend - 12oz Medium Grind",
           "sku": "HOU-BLE-12-MED",
-          "size": "12oz",
-          "grind": "medium",
-          "price": 14.99,
+          "attributes": {
+            "size": "12oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 14.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 120,
           "weight": 340
         },
         {
           "name": "Javamate House Blend - 16oz Whole Bean",
           "sku": "HOU-BLE-16-WB",
-          "size": "16oz",
-          "grind": "whole-bean",
-          "price": 19.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 19.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 100,
           "weight": 454
         },
         {
           "name": "Javamate House Blend - 16oz Medium Grind",
           "sku": "HOU-BLE-16-MED",
-          "size": "16oz",
-          "grind": "medium",
-          "price": 19.99,
+          "attributes": {
+            "size": "16oz",
+            "grind": "medium"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 19.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 80,
           "weight": 454
         },
         {
           "name": "Javamate House Blend - 2lb Whole Bean",
           "sku": "HOU-BLE-2LB-WB",
-          "size": "2lb",
-          "grind": "whole-bean",
-          "price": 34.99,
+          "attributes": {
+            "size": "2lb",
+            "grind": "whole-bean"
+          },
+          "priceVariants": [
+            {
+              "identifier": "usd",
+              "price": 34.99,
+              "currency": "USD"
+            }
+          ],
           "stock": 40,
           "weight": 908
         }
@@ -760,18 +880,20 @@
   "importInstructions": {
     "steps": [
       "1. Log into your Crystallize tenant dashboard",
-      "2. Navigate to Settings > Shapes and create the 'coffee-product' and 'coffee-variant' shapes using the specifications above",
+      "2. Navigate to Settings > Shapes and create the 'coffee-product' shape using the specifications above",
       "3. Go to Catalogue and create the category structure",
       "4. Import products one by one using the product data provided",
-      "5. For each product, create variants using the variant specifications",
+      "5. For each product, create variants using the variant specifications with proper priceVariants structure",
       "6. Set up price books and assign prices to variants",
       "7. Configure stock locations and assign inventory",
       "8. Set up subscription plans if offering recurring deliveries",
-      "9. Configure Stripe integration and map price IDs to variants",
+      "9. Configure Stripe integration and map price IDs to variants using externalReference field",
       "10. Test the integration with your application"
     ],
     "notes": [
-      "Ensure all required components are marked as required in the shape configuration",
+      "Variants use 'attributes' for size and grind properties, not separate component fields",
+      "Pricing is handled through 'priceVariants' array with identifier, price, and currency",
+      "Stripe price IDs should be stored in the 'externalReference' field for variants",
       "Upload product images to Crystallize media library before assigning to products",
       "Configure SEO components for better search engine optimization",
       "Set up proper URL patterns for product pages",

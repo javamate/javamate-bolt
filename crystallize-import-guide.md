@@ -8,7 +8,7 @@ This guide provides step-by-step instructions for importing the Javamate Coffee 
 - Access to Crystallize PIM (Product Information Management)
 - Product images uploaded to a CDN or image hosting service
 
-## Step 1: Create Product Shapes
+## Step 1: Create Product Shape
 
 ### Coffee Product Shape
 
@@ -38,20 +38,7 @@ This guide provides step-by-step instructions for importing the Javamate Coffee 
 - **images** (Images, Required, Max 10): Product photos
 - **seo** (Content Chunk): SEO title and meta description
 
-### Coffee Variant Shape
-
-1. Create another shape with identifier `coffee-variant`
-2. Set type as **Product Variant**
-3. Add these components:
-
-- **name** (Single Line, Required): Variant name
-- **sku** (Single Line, Required): Stock keeping unit
-- **size** (Selection, Required): 8oz, 12oz, 16oz, 2lb, 5lb
-- **grind** (Selection, Required): Whole Bean, Coarse, Medium-Coarse, Medium, Medium-Fine, Fine
-- **price** (Numeric, Required, 2 decimal places): Price in USD
-- **stock** (Numeric, 0 decimal places): Stock quantity
-- **weight** (Numeric, 0 decimal places): Weight in grams
-- **stripe-price-id** (Single Line): Stripe price ID for payment processing
+**Note:** Variants are created directly in the product catalog, not as separate shapes. Crystallize handles variants with attributes and priceVariants structure.
 
 ## Step 2: Set Up Categories
 
@@ -88,10 +75,25 @@ Create the following category structure in **Catalogue**:
 - Clean finish
 
 **Variants:**
-1. 12oz Whole Bean - SKU: ETH-YIR-12-WB - $16.99
-2. 12oz Medium Grind - SKU: ETH-YIR-12-MED - $16.99
-3. 16oz Whole Bean - SKU: ETH-YIR-16-WB - $21.99
-4. 16oz Medium Grind - SKU: ETH-YIR-16-MED - $21.99
+1. 12oz Whole Bean - SKU: ETH-YIR-12-WB
+   - Attributes: size="12oz", grind="whole-bean"
+   - Price Variants: USD $16.99
+   - Stock: 100, Weight: 340g
+
+2. 12oz Medium Grind - SKU: ETH-YIR-12-MED
+   - Attributes: size="12oz", grind="medium"
+   - Price Variants: USD $16.99
+   - Stock: 75, Weight: 340g
+
+3. 16oz Whole Bean - SKU: ETH-YIR-16-WB
+   - Attributes: size="16oz", grind="whole-bean"
+   - Price Variants: USD $21.99
+   - Stock: 80, Weight: 454g
+
+4. 16oz Medium Grind - SKU: ETH-YIR-16-MED
+   - Attributes: size="16oz", grind="medium"
+   - Price Variants: USD $21.99
+   - Stock: 60, Weight: 454g
 
 ### Colombian Supremo
 
@@ -107,10 +109,10 @@ Create the following category structure in **Catalogue**:
 - New Arrival: No
 
 **Variants:**
-1. 12oz Whole Bean - SKU: COL-SUP-12-WB - $15.99
-2. 12oz Medium Grind - SKU: COL-SUP-12-MED - $15.99
-3. 16oz Whole Bean - SKU: COL-SUP-16-WB - $20.99
-4. 16oz Medium Grind - SKU: COL-SUP-16-MED - $20.99
+1. 12oz Whole Bean - SKU: COL-SUP-12-WB - USD $15.99
+2. 12oz Medium Grind - SKU: COL-SUP-12-MED - USD $15.99
+3. 16oz Whole Bean - SKU: COL-SUP-16-WB - USD $20.99
+4. 16oz Medium Grind - SKU: COL-SUP-16-MED - USD $20.99
 
 ### Guatemala Antigua
 
@@ -126,10 +128,10 @@ Create the following category structure in **Catalogue**:
 - New Arrival: No
 
 **Variants:**
-1. 12oz Whole Bean - SKU: GUA-ANT-12-WB - $17.99
-2. 12oz Medium Grind - SKU: GUA-ANT-12-MED - $17.99
-3. 16oz Whole Bean - SKU: GUA-ANT-16-WB - $22.99
-4. 16oz Medium Grind - SKU: GUA-ANT-16-MED - $22.99
+1. 12oz Whole Bean - SKU: GUA-ANT-12-WB - USD $17.99
+2. 12oz Medium Grind - SKU: GUA-ANT-12-MED - USD $17.99
+3. 16oz Whole Bean - SKU: GUA-ANT-16-WB - USD $22.99
+4. 16oz Medium Grind - SKU: GUA-ANT-16-MED - USD $22.99
 
 ### Sumatra Mandheling
 
@@ -145,10 +147,10 @@ Create the following category structure in **Catalogue**:
 - New Arrival: No
 
 **Variants:**
-1. 12oz Whole Bean - SKU: SUM-MAN-12-WB - $18.99
-2. 12oz Medium Grind - SKU: SUM-MAN-12-MED - $18.99
-3. 16oz Whole Bean - SKU: SUM-MAN-16-WB - $23.99
-4. 16oz Medium Grind - SKU: SUM-MAN-16-MED - $23.99
+1. 12oz Whole Bean - SKU: SUM-MAN-12-WB - USD $18.99
+2. 12oz Medium Grind - SKU: SUM-MAN-12-MED - USD $18.99
+3. 16oz Whole Bean - SKU: SUM-MAN-16-WB - USD $23.99
+4. 16oz Medium Grind - SKU: SUM-MAN-16-MED - USD $23.99
 
 ### Organic Peru SWP Decaf
 
@@ -164,10 +166,11 @@ Create the following category structure in **Catalogue**:
 - New Arrival: Yes
 
 **Variants:**
-1. 12oz Whole Bean - SKU: PER-DEC-12-WB - $19.99 - Stripe ID: price_1RKgo2R1hBQXgqR7RYvtL02O
-2. 12oz Medium Grind - SKU: PER-DEC-12-MED - $19.99
-3. 16oz Whole Bean - SKU: PER-DEC-16-WB - $24.99
-4. 16oz Medium Grind - SKU: PER-DEC-16-MED - $24.99
+1. 12oz Whole Bean - SKU: PER-DEC-12-WB - USD $19.99
+   - External Reference: price_1RKgo2R1hBQXgqR7RYvtL02O (Stripe Price ID)
+2. 12oz Medium Grind - SKU: PER-DEC-12-MED - USD $19.99
+3. 16oz Whole Bean - SKU: PER-DEC-16-WB - USD $24.99
+4. 16oz Medium Grind - SKU: PER-DEC-16-MED - USD $24.99
 
 ### Javamate House Blend
 
@@ -182,17 +185,26 @@ Create the following category structure in **Catalogue**:
 - New Arrival: No
 
 **Variants:**
-1. 12oz Whole Bean - SKU: HOU-BLE-12-WB - $14.99
-2. 12oz Medium Grind - SKU: HOU-BLE-12-MED - $14.99
-3. 16oz Whole Bean - SKU: HOU-BLE-16-WB - $19.99
-4. 16oz Medium Grind - SKU: HOU-BLE-16-MED - $19.99
-5. 2lb Whole Bean - SKU: HOU-BLE-2LB-WB - $34.99
+1. 12oz Whole Bean - SKU: HOU-BLE-12-WB - USD $14.99
+2. 12oz Medium Grind - SKU: HOU-BLE-12-MED - USD $14.99
+3. 16oz Whole Bean - SKU: HOU-BLE-16-WB - USD $19.99
+4. 16oz Medium Grind - SKU: HOU-BLE-16-MED - USD $19.99
+5. 2lb Whole Bean - SKU: HOU-BLE-2LB-WB - USD $34.99
 
 ## Step 4: Configure Pricing
 
 1. Navigate to **Settings > Price Books**
 2. Create a price book named "USD Retail Prices" with currency USD
-3. Assign prices to all variants according to the specifications above
+3. For each variant, configure the priceVariants array:
+   ```json
+   "priceVariants": [
+     {
+       "identifier": "usd",
+       "price": 16.99,
+       "currency": "USD"
+     }
+   ]
+   ```
 
 ## Step 5: Set Up Inventory
 
@@ -201,13 +213,27 @@ Create the following category structure in **Catalogue**:
 3. Set minimum stock level to 10 and maximum to 1000
 4. Assign initial stock quantities to all variants
 
-## Step 6: Configure Stripe Integration
+## Step 6: Configure Variant Attributes
 
-1. For variants with Stripe price IDs, add them to the `stripe-price-id` field
+For each variant, set the attributes properly:
+
+```json
+"attributes": {
+  "size": "12oz",
+  "grind": "whole-bean"
+}
+```
+
+Available size options: 8oz, 12oz, 16oz, 2lb, 5lb
+Available grind options: whole-bean, coarse, medium-coarse, medium, medium-fine, fine
+
+## Step 7: Configure Stripe Integration
+
+1. For variants with Stripe price IDs, add them to the `externalReference` field
 2. Ensure the Stripe price IDs match those configured in your Stripe dashboard
 3. Test the integration with your application's checkout process
 
-## Step 7: Set Up Subscriptions (Optional)
+## Step 8: Set Up Subscriptions (Optional)
 
 If offering subscription services:
 
@@ -217,7 +243,7 @@ If offering subscription services:
    - Bi-Weekly Coffee Subscription
 3. Configure pricing and billing cycles
 
-## Step 8: Configure Webhooks
+## Step 9: Configure Webhooks
 
 Set up webhooks to sync data with your application:
 
@@ -227,12 +253,42 @@ Set up webhooks to sync data with your application:
    - Inventory changes
    - Order creation
 
-## Step 9: Test Integration
+## Step 10: Test Integration
 
 1. Verify all products display correctly in your application
 2. Test variant selection and pricing
 3. Confirm checkout process works with Stripe integration
 4. Validate inventory updates sync properly
+
+## Important Notes
+
+### Variant Structure
+- **Attributes**: Use the `attributes` object to store size and grind information
+- **Price Variants**: Use the `priceVariants` array for pricing with identifier, price, and currency
+- **External Reference**: Store Stripe price IDs in the `externalReference` field
+- **Stock**: Set stock levels directly on the variant
+
+### Data Format
+```json
+{
+  "name": "Product Name - Size Grind",
+  "sku": "PRODUCT-SIZE-GRIND",
+  "attributes": {
+    "size": "12oz",
+    "grind": "whole-bean"
+  },
+  "priceVariants": [
+    {
+      "identifier": "usd",
+      "price": 16.99,
+      "currency": "USD"
+    }
+  ],
+  "stock": 100,
+  "weight": 340,
+  "externalReference": "stripe_price_id_here"
+}
+```
 
 ## Additional Configuration
 
@@ -256,9 +312,10 @@ Set up webhooks to sync data with your application:
 ### Common Issues
 
 1. **Missing Required Fields**: Ensure all required components are filled
-2. **Pricing Errors**: Verify price book configuration and currency settings
+2. **Pricing Errors**: Verify priceVariants structure and currency settings
 3. **Image Loading Issues**: Check image URLs and CDN configuration
 4. **API Connection Problems**: Verify access tokens and tenant configuration
+5. **Variant Attribute Issues**: Ensure attributes are properly structured as key-value pairs
 
 ### Support Resources
 
