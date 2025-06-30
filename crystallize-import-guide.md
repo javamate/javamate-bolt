@@ -1,222 +1,133 @@
-# Crystallize Import Guide for Javamate Coffee Catalog
+# Crystallize CLI Import Guide for Javamate Coffee Catalog
 
-This guide provides step-by-step instructions for importing the Javamate Coffee product catalog into Crystallize.
+This guide provides step-by-step instructions for importing the Javamate Coffee product catalog into Crystallize using the `@crystallize/cli-next` import command.
 
 ## Prerequisites
 
+- Node.js 18+ installed
 - Crystallize tenant account with admin access
-- Access to Crystallize PIM (Product Information Management)
-- Product images uploaded to a CDN or image hosting service
+- `@crystallize/cli-next` package installed globally
 
-## Step 1: Create Product Shape
+## Installation
 
-### Coffee Product Shape
+Install the Crystallize CLI:
 
-1. Navigate to **Settings > Shapes** in your Crystallize dashboard
-2. Click **Create Shape** and select **Product**
-3. Set the identifier as `coffee-product` and name as `Coffee Product`
-4. Add the following components:
-
-#### Basic Information
-- **name** (Single Line, Required): Product Name
-- **description** (Rich Text, Required): Full product description
-- **short-description** (Single Line, Required): Brief product summary
-
-#### Coffee-Specific Attributes
-- **origin** (Single Line, Required): Origin country/region
-- **roast-level** (Selection, Required): Light, Medium-Light, Medium, Medium-Dark, Dark
-- **processing-method** (Selection): Washed, Natural, Honey, Semi-Washed
-- **altitude** (Single Line): Growing altitude
-- **tasting-notes** (Paragraph Collection, Max 5): Flavor notes
-- **certifications** (Selection, Multiple): Organic, Fair Trade, etc.
-
-#### Marketing Flags
-- **featured** (Boolean): Featured product flag
-- **new-arrival** (Boolean): New arrival flag
-
-#### Media & SEO
-- **images** (Images, Required, Max 10): Product photos
-- **seo** (Content Chunk): SEO title and meta description
-
-**Note:** Variants are created directly in the product catalog, not as separate shapes. Crystallize handles variants with attributes and priceVariants structure.
-
-## Step 2: Set Up Categories
-
-Create the following category structure in **Catalogue**:
-
-```
-├── Single Origin
-├── Blends  
-├── Decaf
-├── Featured
-└── New Arrivals
+```bash
+npm install -g @crystallize/cli-next
 ```
 
-## Step 3: Import Products
+## Step 1: Prepare the Import File
 
-### Ethiopian Yirgacheffe
+The `crystallize-product-specification.json` file is already formatted for the CLI import command. It includes:
 
-**Basic Information:**
-- Name: Ethiopian Yirgacheffe
-- Short Description: Bright and fruity with notes of bergamot and lemon
-- Origin: Ethiopia
-- Roast Level: Light
-- Processing Method: Washed
-- Altitude: 1,800-2,200 meters
-- Certifications: Organic, Fair Trade
-- Featured: Yes
-- New Arrival: Yes
+- **Spec Section**: Defines shapes, price variants, VAT types, stock locations, and subscription plans
+- **Items Section**: Contains all product data with components and variants
 
-**Tasting Notes:**
-- Bergamot
-- Lemon zest  
-- Floral notes
-- Wine-like acidity
-- Clean finish
+## Step 2: Authenticate with Crystallize
 
-**Variants:**
-1. 12oz Whole Bean - SKU: ETH-YIR-12-WB
-   - Attributes: size="12oz", grind="whole-bean"
-   - Price Variants: USD $16.99
-   - Stock: 100, Weight: 340g
+Set up your Crystallize credentials:
 
-2. 12oz Medium Grind - SKU: ETH-YIR-12-MED
-   - Attributes: size="12oz", grind="medium"
-   - Price Variants: USD $16.99
-   - Stock: 75, Weight: 340g
+```bash
+crystallize config
+```
 
-3. 16oz Whole Bean - SKU: ETH-YIR-16-WB
-   - Attributes: size="16oz", grind="whole-bean"
-   - Price Variants: USD $21.99
-   - Stock: 80, Weight: 454g
+Enter your:
+- Tenant identifier
+- Access token ID  
+- Access token secret
 
-4. 16oz Medium Grind - SKU: ETH-YIR-16-MED
-   - Attributes: size="16oz", grind="medium"
-   - Price Variants: USD $21.99
-   - Stock: 60, Weight: 454g
+## Step 3: Validate the Import File
 
-### Colombian Supremo
+Before importing, validate the specification:
 
-**Basic Information:**
-- Name: Colombian Supremo
-- Short Description: Sweet and balanced with notes of caramel and chocolate
-- Origin: Colombia
-- Roast Level: Medium
-- Processing Method: Washed
-- Altitude: 1,200-1,800 meters
-- Certifications: Rainforest Alliance
-- Featured: Yes
-- New Arrival: No
+```bash
+crystallize import --validate crystallize-product-specification.json
+```
 
-**Variants:**
-1. 12oz Whole Bean - SKU: COL-SUP-12-WB - USD $15.99
-2. 12oz Medium Grind - SKU: COL-SUP-12-MED - USD $15.99
-3. 16oz Whole Bean - SKU: COL-SUP-16-WB - USD $20.99
-4. 16oz Medium Grind - SKU: COL-SUP-16-MED - USD $20.99
+This will check for:
+- Correct schema format
+- Required fields
+- Data type validation
+- Reference integrity
 
-### Guatemala Antigua
+## Step 4: Import the Catalog
 
-**Basic Information:**
-- Name: Guatemala Antigua
-- Short Description: Rich and complex with notes of cocoa and spice
-- Origin: Guatemala
-- Roast Level: Medium-Dark
-- Processing Method: Washed
-- Altitude: 1,500-1,700 meters
-- Certifications: Organic, Shade Grown
-- Featured: Yes
-- New Arrival: No
+Run the import command:
 
-**Variants:**
-1. 12oz Whole Bean - SKU: GUA-ANT-12-WB - USD $17.99
-2. 12oz Medium Grind - SKU: GUA-ANT-12-MED - USD $17.99
-3. 16oz Whole Bean - SKU: GUA-ANT-16-WB - USD $22.99
-4. 16oz Medium Grind - SKU: GUA-ANT-16-MED - USD $22.99
+```bash
+crystallize import crystallize-product-specification.json
+```
 
-### Sumatra Mandheling
+### Import Options
 
-**Basic Information:**
-- Name: Sumatra Mandheling
-- Short Description: Bold and earthy with notes of cedar and herbs
-- Origin: Indonesia
-- Roast Level: Dark
-- Processing Method: Semi-Washed
-- Altitude: 750-1,500 meters
-- Certifications: Organic, Fair Trade
-- Featured: Yes
-- New Arrival: No
+For a dry run (preview without importing):
+```bash
+crystallize import --dry-run crystallize-product-specification.json
+```
 
-**Variants:**
-1. 12oz Whole Bean - SKU: SUM-MAN-12-WB - USD $18.99
-2. 12oz Medium Grind - SKU: SUM-MAN-12-MED - USD $18.99
-3. 16oz Whole Bean - SKU: SUM-MAN-16-WB - USD $23.99
-4. 16oz Medium Grind - SKU: SUM-MAN-16-MED - USD $23.99
+To force overwrite existing items:
+```bash
+crystallize import --force crystallize-product-specification.json
+```
 
-### Organic Peru SWP Decaf
+To import only specific sections:
+```bash
+crystallize import --only-spec crystallize-product-specification.json
+crystallize import --only-items crystallize-product-specification.json
+```
 
-**Basic Information:**
-- Name: Organic Peru SWP Decaf
-- Short Description: Chemical-free decaf with rich chocolate and caramel notes
-- Origin: Peru
-- Roast Level: Medium
-- Processing Method: Washed
-- Altitude: 1,200-1,800 meters
-- Certifications: Organic, Fair Trade
-- Featured: No
-- New Arrival: Yes
+## Step 5: Verify the Import
 
-**Variants:**
-1. 12oz Whole Bean - SKU: PER-DEC-12-WB - USD $19.99
-   - External Reference: price_1RKgo2R1hBQXgqR7RYvtL02O (Stripe Price ID)
-2. 12oz Medium Grind - SKU: PER-DEC-12-MED - USD $19.99
-3. 16oz Whole Bean - SKU: PER-DEC-16-WB - USD $24.99
-4. 16oz Medium Grind - SKU: PER-DEC-16-MED - USD $24.99
+After import completion:
 
-### Javamate House Blend
+1. **Check Shapes**: Verify the `coffee-product` shape was created with all components
+2. **Review Products**: Confirm all 6 products were imported correctly
+3. **Validate Variants**: Check that all variants have proper attributes and pricing
+4. **Test Stock Locations**: Ensure inventory was assigned correctly
+5. **Verify Price Variants**: Confirm USD pricing is set up properly
 
-**Basic Information:**
-- Name: Javamate House Blend
-- Short Description: Our signature blend with perfect balance and versatility
-- Origin: Blend (Colombia, Brazil, Guatemala)
-- Roast Level: Medium
-- Processing Method: Washed
-- Certifications: Rainforest Alliance
-- Featured: Yes
-- New Arrival: No
+## Import Structure Breakdown
 
-**Variants:**
-1. 12oz Whole Bean - SKU: HOU-BLE-12-WB - USD $14.99
-2. 12oz Medium Grind - SKU: HOU-BLE-12-MED - USD $14.99
-3. 16oz Whole Bean - SKU: HOU-BLE-16-WB - USD $19.99
-4. 16oz Medium Grind - SKU: HOU-BLE-16-MED - USD $19.99
-5. 2lb Whole Bean - SKU: HOU-BLE-2LB-WB - USD $34.99
+### Spec Section
 
-## Step 4: Configure Pricing
+#### Shapes
+- **coffee-product**: Product shape with components for coffee-specific attributes
+  - Basic info (name, description, origin)
+  - Coffee attributes (roast level, processing method, altitude)
+  - Marketing flags (featured, new arrival)
+  - Media and SEO components
 
-1. Navigate to **Settings > Price Books**
-2. Create a price book named "USD Retail Prices" with currency USD
-3. For each variant, configure the priceVariants array:
-   ```json
-   "priceVariants": [
-     {
-       "identifier": "usd",
-       "price": 16.99,
-       "currency": "USD"
-     }
-   ]
-   ```
+#### Price Variants
+- **usd**: USD currency configuration
 
-## Step 5: Set Up Inventory
+#### Stock Locations
+- **main-warehouse**: Primary inventory location with min/max settings
 
-1. Go to **Settings > Stock Locations**
-2. Create a stock location named "Main Warehouse"
-3. Set minimum stock level to 10 and maximum to 1000
-4. Assign initial stock quantities to all variants
+#### Subscription Plans
+- **monthly-coffee**: Monthly subscription option
 
-## Step 6: Configure Variant Attributes
+### Items Section
 
-For each variant, set the attributes properly:
+Each product includes:
+- **Tree Path**: URL structure (`/shop/product-name`)
+- **Components**: All product data matching the shape definition
+- **Variants**: Size and grind combinations with pricing and inventory
 
+### Key Features
+
+#### Rich Text Content
+Descriptions use HTML format:
+```json
+"description": {
+  "html": [
+    "<p>Product description paragraph 1</p>",
+    "<p>Product description paragraph 2</p>"
+  ]
+}
+```
+
+#### Variant Attributes
+Size and grind stored as attributes:
 ```json
 "attributes": {
   "size": "12oz",
@@ -224,116 +135,166 @@ For each variant, set the attributes properly:
 }
 ```
 
-Available size options: 8oz, 12oz, 16oz, 2lb, 5lb
-Available grind options: whole-bean, coarse, medium-coarse, medium, medium-fine, fine
-
-## Step 7: Configure Stripe Integration
-
-1. For variants with Stripe price IDs, add them to the `externalReference` field
-2. Ensure the Stripe price IDs match those configured in your Stripe dashboard
-3. Test the integration with your application's checkout process
-
-## Step 8: Set Up Subscriptions (Optional)
-
-If offering subscription services:
-
-1. Navigate to **Settings > Subscription Plans**
-2. Create plans for:
-   - Monthly Coffee Subscription
-   - Bi-Weekly Coffee Subscription
-3. Configure pricing and billing cycles
-
-## Step 9: Configure Webhooks
-
-Set up webhooks to sync data with your application:
-
-1. Go to **Settings > Webhooks**
-2. Add webhook endpoints for:
-   - Product updates
-   - Inventory changes
-   - Order creation
-
-## Step 10: Test Integration
-
-1. Verify all products display correctly in your application
-2. Test variant selection and pricing
-3. Confirm checkout process works with Stripe integration
-4. Validate inventory updates sync properly
-
-## Important Notes
-
-### Variant Structure
-- **Attributes**: Use the `attributes` object to store size and grind information
-- **Price Variants**: Use the `priceVariants` array for pricing with identifier, price, and currency
-- **External Reference**: Store Stripe price IDs in the `externalReference` field
-- **Stock**: Set stock levels directly on the variant
-
-### Data Format
+#### Pricing Structure
+Simple price variant mapping:
 ```json
-{
-  "name": "Product Name - Size Grind",
-  "sku": "PRODUCT-SIZE-GRIND",
-  "attributes": {
-    "size": "12oz",
-    "grind": "whole-bean"
-  },
-  "priceVariants": [
-    {
-      "identifier": "usd",
-      "price": 16.99,
-      "currency": "USD"
-    }
-  ],
-  "stock": 100,
-  "weight": 340,
-  "externalReference": "stripe_price_id_here"
+"priceVariants": {
+  "usd": 16.99
 }
 ```
 
-## Additional Configuration
+#### Stock Management
+Inventory by location:
+```json
+"stock": {
+  "main-warehouse": 100
+}
+```
 
-### SEO Optimization
-- Configure URL patterns for product pages
-- Set up meta titles and descriptions
-- Enable sitemap generation
+#### External References
+Stripe price IDs for payment integration:
+```json
+"externalReference": "price_1RKgo2R1hBQXgqR7RYvtL02O"
+```
 
-### Image Optimization
-- Upload high-quality product images
-- Configure image transformations for different screen sizes
-- Set up CDN for fast image delivery
+## Product Catalog Overview
 
-### API Configuration
-- Configure API access tokens for your application
-- Set up proper authentication and permissions
-- Test API endpoints for product data retrieval
+### Products Included
+
+1. **Ethiopian Yirgacheffe** - Light roast, bright and fruity
+2. **Colombian Supremo** - Medium roast, balanced and sweet
+3. **Guatemala Antigua** - Medium-dark roast, rich and complex
+4. **Sumatra Mandheling** - Dark roast, bold and earthy
+5. **Organic Peru SWP Decaf** - Medium roast, chemical-free decaf
+6. **Javamate House Blend** - Medium roast, signature blend
+
+### Variant Options
+
+Each product includes variants for:
+- **Sizes**: 12oz, 16oz (House Blend also includes 2lb)
+- **Grinds**: Whole bean, Medium grind
+- **Pricing**: USD pricing for all variants
+- **Stock**: Inventory levels per variant
+
+### Certifications
+
+Products include various certifications:
+- Organic
+- Fair Trade
+- Rainforest Alliance
+- Shade Grown
+
+## Post-Import Configuration
+
+### 1. Image Upload
+
+Upload product images to Crystallize media library and update image references if needed.
+
+### 2. SEO Configuration
+
+Verify SEO components are properly set:
+- Meta titles
+- Meta descriptions
+- URL patterns
+
+### 3. Category Assignment
+
+Organize products into categories:
+- Single Origin
+- Blends
+- Decaf
+- Featured
+- New Arrivals
+
+### 4. Stripe Integration
+
+For variants with `externalReference`:
+1. Verify Stripe price IDs are correct
+2. Test payment integration
+3. Configure webhook endpoints
+
+### 5. Subscription Setup
+
+If using subscriptions:
+1. Configure subscription plans
+2. Set up billing cycles
+3. Test subscription checkout
 
 ## Troubleshooting
 
-### Common Issues
+### Common Import Issues
 
-1. **Missing Required Fields**: Ensure all required components are filled
-2. **Pricing Errors**: Verify priceVariants structure and currency settings
-3. **Image Loading Issues**: Check image URLs and CDN configuration
-4. **API Connection Problems**: Verify access tokens and tenant configuration
-5. **Variant Attribute Issues**: Ensure attributes are properly structured as key-value pairs
+1. **Authentication Errors**
+   ```bash
+   crystallize config --reset
+   ```
 
-### Support Resources
+2. **Validation Failures**
+   - Check JSON syntax
+   - Verify required fields
+   - Validate data types
 
-- Crystallize Documentation: https://crystallize.com/learn
-- API Reference: https://crystallize.com/learn/developer-guides/api-overview
-- Community Forum: https://crystallize.com/community
+3. **Shape Creation Issues**
+   - Ensure unique component IDs
+   - Check component type definitions
+   - Verify selection options format
 
-## Maintenance
+4. **Variant Import Problems**
+   - Validate attribute structure
+   - Check price variant format
+   - Ensure stock location exists
 
-### Regular Tasks
-- Update product descriptions and images
-- Monitor inventory levels
-- Review and update pricing
-- Add new products and variants as needed
-- Monitor API usage and performance
+### CLI Commands Reference
 
-### Backup Strategy
-- Export product data regularly
-- Backup media files
-- Document configuration changes
-- Maintain version control for shape definitions
+```bash
+# Show help
+crystallize import --help
+
+# Check CLI version
+crystallize --version
+
+# View current configuration
+crystallize config --show
+
+# Import with verbose logging
+crystallize import --verbose crystallize-product-specification.json
+
+# Import specific tenant
+crystallize import --tenant your-tenant crystallize-product-specification.json
+```
+
+## Monitoring Import Progress
+
+The CLI provides real-time feedback:
+- Shape creation progress
+- Item import status
+- Error reporting
+- Success confirmation
+
+## Best Practices
+
+1. **Always validate before importing**
+2. **Use dry-run for testing**
+3. **Backup existing data**
+4. **Import during low-traffic periods**
+5. **Monitor import logs**
+6. **Test functionality after import**
+
+## Support Resources
+
+- **Crystallize CLI Documentation**: https://crystallize.com/learn/developer-guides/cli
+- **Import Schema Reference**: https://crystallize.com/learn/developer-guides/import-export
+- **Community Support**: https://crystallize.com/community
+- **API Documentation**: https://crystallize.com/learn/developer-guides/api-overview
+
+## Next Steps
+
+After successful import:
+
+1. **Configure your application** to use Crystallize API
+2. **Set up webhooks** for real-time updates
+3. **Test the complete flow** from catalog to checkout
+4. **Monitor performance** and optimize as needed
+5. **Plan for ongoing content management**
+
+The import process creates a complete, production-ready coffee catalog that integrates seamlessly with the Javamate Coffee application's existing Stripe and Supabase infrastructure.

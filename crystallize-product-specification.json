@@ -1,157 +1,205 @@
 {
   "spec": {
-    "name": "Javamate Coffee Product Catalog",
-    "description": "Complete product specification for Javamate Coffee Roasters e-commerce catalog",
-    "version": "1.0.0"
-  },
-  "shapes": [
-    {
-      "identifier": "coffee-product",
-      "name": "Coffee Product",
-      "type": "product",
-      "components": [
-        {
-          "id": "name",
-          "name": "Product Name",
-          "type": "singleLine",
-          "required": true
-        },
-        {
-          "id": "description",
-          "name": "Description",
-          "type": "richText",
-          "required": true
-        },
-        {
-          "id": "short-description",
-          "name": "Short Description",
-          "type": "singleLine",
-          "required": true
-        },
-        {
-          "id": "origin",
-          "name": "Origin Country",
-          "type": "singleLine",
-          "required": true
-        },
-        {
-          "id": "roast-level",
-          "name": "Roast Level",
-          "type": "selection",
-          "config": {
-            "options": [
-              { "key": "light", "value": "Light" },
-              { "key": "medium-light", "value": "Medium-Light" },
-              { "key": "medium", "value": "Medium" },
-              { "key": "medium-dark", "value": "Medium-Dark" },
-              { "key": "dark", "value": "Dark" }
-            ]
+    "shapes": [
+      {
+        "identifier": "coffee-product",
+        "name": "Coffee Product",
+        "type": "product",
+        "components": [
+          {
+            "id": "name",
+            "name": "Product Name",
+            "type": "singleLine",
+            "required": true
           },
-          "required": true
-        },
-        {
-          "id": "processing-method",
-          "name": "Processing Method",
-          "type": "selection",
-          "config": {
-            "options": [
-              { "key": "washed", "value": "Washed" },
-              { "key": "natural", "value": "Natural" },
-              { "key": "honey", "value": "Honey" },
-              { "key": "semi-washed", "value": "Semi-Washed" }
-            ]
-          }
-        },
-        {
-          "id": "altitude",
-          "name": "Growing Altitude",
-          "type": "singleLine"
-        },
-        {
-          "id": "tasting-notes",
-          "name": "Tasting Notes",
-          "type": "paragraphCollection",
-          "config": {
-            "max": 5
-          }
-        },
-        {
-          "id": "certifications",
-          "name": "Certifications",
-          "type": "selection",
-          "config": {
-            "min": 0,
-            "max": 10,
-            "options": [
-              { "key": "organic", "value": "Organic" },
-              { "key": "fair-trade", "value": "Fair Trade" },
-              { "key": "rainforest-alliance", "value": "Rainforest Alliance" },
-              { "key": "bird-friendly", "value": "Bird Friendly" },
-              { "key": "shade-grown", "value": "Shade Grown" },
-              { "key": "direct-trade", "value": "Direct Trade" },
-              { "key": "utz", "value": "UTZ Certified" }
-            ]
-          }
-        },
-        {
-          "id": "featured",
-          "name": "Featured Product",
-          "type": "boolean"
-        },
-        {
-          "id": "new-arrival",
-          "name": "New Arrival",
-          "type": "boolean"
-        },
-        {
-          "id": "images",
-          "name": "Product Images",
-          "type": "images",
-          "config": {
-            "max": 10
+          {
+            "id": "description",
+            "name": "Description",
+            "type": "richText",
+            "required": true
           },
-          "required": true
-        },
-        {
-          "id": "seo",
-          "name": "SEO",
-          "type": "contentChunk",
-          "config": {
-            "components": [
-              {
-                "id": "title",
-                "name": "SEO Title",
-                "type": "singleLine"
-              },
-              {
-                "id": "description",
-                "name": "Meta Description",
-                "type": "singleLine"
-              }
-            ]
+          {
+            "id": "short-description",
+            "name": "Short Description",
+            "type": "singleLine",
+            "required": true
+          },
+          {
+            "id": "origin",
+            "name": "Origin Country",
+            "type": "singleLine",
+            "required": true
+          },
+          {
+            "id": "roast-level",
+            "name": "Roast Level",
+            "type": "selection",
+            "config": {
+              "options": [
+                { "key": "light", "value": "Light" },
+                { "key": "medium-light", "value": "Medium-Light" },
+                { "key": "medium", "value": "Medium" },
+                { "key": "medium-dark", "value": "Medium-Dark" },
+                { "key": "dark", "value": "Dark" }
+              ]
+            },
+            "required": true
+          },
+          {
+            "id": "processing-method",
+            "name": "Processing Method",
+            "type": "selection",
+            "config": {
+              "options": [
+                { "key": "washed", "value": "Washed" },
+                { "key": "natural", "value": "Natural" },
+                { "key": "honey", "value": "Honey" },
+                { "key": "semi-washed", "value": "Semi-Washed" }
+              ]
+            }
+          },
+          {
+            "id": "altitude",
+            "name": "Growing Altitude",
+            "type": "singleLine"
+          },
+          {
+            "id": "tasting-notes",
+            "name": "Tasting Notes",
+            "type": "paragraphCollection",
+            "config": {
+              "max": 5
+            }
+          },
+          {
+            "id": "certifications",
+            "name": "Certifications",
+            "type": "selection",
+            "config": {
+              "min": 0,
+              "max": 10,
+              "options": [
+                { "key": "organic", "value": "Organic" },
+                { "key": "fair-trade", "value": "Fair Trade" },
+                { "key": "rainforest-alliance", "value": "Rainforest Alliance" },
+                { "key": "bird-friendly", "value": "Bird Friendly" },
+                { "key": "shade-grown", "value": "Shade Grown" },
+                { "key": "direct-trade", "value": "Direct Trade" },
+                { "key": "utz", "value": "UTZ Certified" }
+              ]
+            }
+          },
+          {
+            "id": "featured",
+            "name": "Featured Product",
+            "type": "boolean"
+          },
+          {
+            "id": "new-arrival",
+            "name": "New Arrival",
+            "type": "boolean"
+          },
+          {
+            "id": "images",
+            "name": "Product Images",
+            "type": "images",
+            "config": {
+              "max": 10
+            },
+            "required": true
+          },
+          {
+            "id": "seo",
+            "name": "SEO",
+            "type": "contentChunk",
+            "config": {
+              "components": [
+                {
+                  "id": "title",
+                  "name": "SEO Title",
+                  "type": "singleLine"
+                },
+                {
+                  "id": "description",
+                  "name": "Meta Description",
+                  "type": "singleLine"
+                }
+              ]
+            }
           }
+        ]
+      }
+    ],
+    "priceVariants": [
+      {
+        "identifier": "usd",
+        "name": "USD",
+        "currency": "USD"
+      }
+    ],
+    "vatTypes": [
+      {
+        "name": "Standard",
+        "percent": 0
+      }
+    ],
+    "stockLocations": [
+      {
+        "identifier": "main-warehouse",
+        "name": "Main Warehouse",
+        "settings": {
+          "minimum": 10,
+          "maximum": 1000
         }
-      ]
-    }
-  ],
-  "products": [
+      }
+    ],
+    "subscriptionPlans": [
+      {
+        "identifier": "monthly-coffee",
+        "name": "Monthly Coffee Subscription",
+        "periods": [
+          {
+            "name": "Monthly",
+            "initial": {
+              "period": 1,
+              "unit": "month"
+            },
+            "recurring": {
+              "period": 1,
+              "unit": "month"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "items": [
     {
       "name": "Ethiopian Yirgacheffe",
       "shape": "coffee-product",
+      "tree": {
+        "path": "/shop/ethiopian-yirgacheffe"
+      },
       "components": {
         "name": "Ethiopian Yirgacheffe",
-        "description": "<p>Our Ethiopian Yirgacheffe is sourced from the highlands of Ethiopia, the birthplace of coffee. This light roast highlights the complex, bright flavors with notes of citrus, bergamot, and a floral finish.</p><p>Grown at high altitudes in the Yirgacheffe region, these beans are carefully processed using the traditional washed method, which enhances their clean, bright acidity and delicate flavor profile.</p><p>Perfect for pour-over brewing methods, this coffee showcases the unique terroir of Ethiopian coffee with its wine-like characteristics and exceptional clarity.</p>",
+        "description": {
+          "html": [
+            "<p>Our Ethiopian Yirgacheffe is sourced from the highlands of Ethiopia, the birthplace of coffee. This light roast highlights the complex, bright flavors with notes of citrus, bergamot, and a floral finish.</p>",
+            "<p>Grown at high altitudes in the Yirgacheffe region, these beans are carefully processed using the traditional washed method, which enhances their clean, bright acidity and delicate flavor profile.</p>",
+            "<p>Perfect for pour-over brewing methods, this coffee showcases the unique terroir of Ethiopian coffee with its wine-like characteristics and exceptional clarity.</p>"
+          ]
+        },
         "short-description": "Bright and fruity with notes of bergamot and lemon.",
         "origin": "Ethiopia",
         "roast-level": "light",
         "processing-method": "washed",
         "altitude": "1,800-2,200 meters",
         "tasting-notes": [
-          "Bergamot",
-          "Lemon zest",
-          "Floral notes",
-          "Wine-like acidity",
-          "Clean finish"
+          { "plainText": ["Bergamot"] },
+          { "plainText": ["Lemon zest"] },
+          { "plainText": ["Floral notes"] },
+          { "plainText": ["Wine-like acidity"] },
+          { "plainText": ["Clean finish"] }
         ],
         "certifications": ["organic", "fair-trade"],
         "featured": true,
@@ -159,7 +207,7 @@
         "images": [
           {
             "src": "https://images.pexels.com/photos/2074130/pexels-photo-2074130.jpeg",
-            "alt": "Ethiopian Yirgacheffe coffee beans"
+            "altText": "Ethiopian Yirgacheffe coffee beans"
           }
         ],
         "seo": {
@@ -175,14 +223,12 @@
             "size": "12oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 16.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 100,
+          "priceVariants": {
+            "usd": 16.99
+          },
+          "stock": {
+            "main-warehouse": 100
+          },
           "weight": 340
         },
         {
@@ -192,14 +238,12 @@
             "size": "12oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 16.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 75,
+          "priceVariants": {
+            "usd": 16.99
+          },
+          "stock": {
+            "main-warehouse": 75
+          },
           "weight": 340
         },
         {
@@ -209,14 +253,12 @@
             "size": "16oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 21.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 80,
+          "priceVariants": {
+            "usd": 21.99
+          },
+          "stock": {
+            "main-warehouse": 80
+          },
           "weight": 454
         },
         {
@@ -226,14 +268,12 @@
             "size": "16oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 21.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 60,
+          "priceVariants": {
+            "usd": 21.99
+          },
+          "stock": {
+            "main-warehouse": 60
+          },
           "weight": 454
         }
       ]
@@ -241,20 +281,29 @@
     {
       "name": "Colombian Supremo",
       "shape": "coffee-product",
+      "tree": {
+        "path": "/shop/colombian-supremo"
+      },
       "components": {
         "name": "Colombian Supremo",
-        "description": "<p>Our Colombian Supremo comes from the high-altitude regions of Colombia, where the perfect combination of climate, soil, and elevation creates exceptional coffee beans.</p><p>This medium roast offers a perfect balance of sweetness with notes of caramel and milk chocolate, complemented by a smooth, clean finish that makes it an ideal everyday coffee.</p><p>The Supremo grade represents the largest and highest quality beans from Colombia, ensuring consistency and exceptional flavor in every cup.</p>",
+        "description": {
+          "html": [
+            "<p>Our Colombian Supremo comes from the high-altitude regions of Colombia, where the perfect combination of climate, soil, and elevation creates exceptional coffee beans.</p>",
+            "<p>This medium roast offers a perfect balance of sweetness with notes of caramel and milk chocolate, complemented by a smooth, clean finish that makes it an ideal everyday coffee.</p>",
+            "<p>The Supremo grade represents the largest and highest quality beans from Colombia, ensuring consistency and exceptional flavor in every cup.</p>"
+          ]
+        },
         "short-description": "Sweet and balanced with notes of caramel and chocolate.",
         "origin": "Colombia",
         "roast-level": "medium",
         "processing-method": "washed",
         "altitude": "1,200-1,800 meters",
         "tasting-notes": [
-          "Caramel",
-          "Milk chocolate",
-          "Smooth body",
-          "Clean finish",
-          "Balanced acidity"
+          { "plainText": ["Caramel"] },
+          { "plainText": ["Milk chocolate"] },
+          { "plainText": ["Smooth body"] },
+          { "plainText": ["Clean finish"] },
+          { "plainText": ["Balanced acidity"] }
         ],
         "certifications": ["rainforest-alliance"],
         "featured": true,
@@ -262,7 +311,7 @@
         "images": [
           {
             "src": "https://images.pexels.com/photos/2299028/pexels-photo-2299028.jpeg",
-            "alt": "Colombian Supremo coffee beans"
+            "altText": "Colombian Supremo coffee beans"
           }
         ],
         "seo": {
@@ -278,14 +327,12 @@
             "size": "12oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 15.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 120,
+          "priceVariants": {
+            "usd": 15.99
+          },
+          "stock": {
+            "main-warehouse": 120
+          },
           "weight": 340
         },
         {
@@ -295,14 +342,12 @@
             "size": "12oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 15.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 90,
+          "priceVariants": {
+            "usd": 15.99
+          },
+          "stock": {
+            "main-warehouse": 90
+          },
           "weight": 340
         },
         {
@@ -312,14 +357,12 @@
             "size": "16oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 20.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 100,
+          "priceVariants": {
+            "usd": 20.99
+          },
+          "stock": {
+            "main-warehouse": 100
+          },
           "weight": 454
         },
         {
@@ -329,14 +372,12 @@
             "size": "16oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 20.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 70,
+          "priceVariants": {
+            "usd": 20.99
+          },
+          "stock": {
+            "main-warehouse": 70
+          },
           "weight": 454
         }
       ]
@@ -344,20 +385,29 @@
     {
       "name": "Guatemala Antigua",
       "shape": "coffee-product",
+      "tree": {
+        "path": "/shop/guatemala-antigua"
+      },
       "components": {
         "name": "Guatemala Antigua",
-        "description": "<p>Our Guatemala Antigua is grown in volcanic soil at high elevations around the historic city of Antigua. The unique terroir of this region, combined with traditional processing methods, creates a coffee with exceptional depth and complexity.</p><p>This medium-dark roast offers a rich, complex flavor profile with notes of cocoa, cinnamon, and orange zest, balanced by a full body and pleasant acidity.</p><p>The volcanic soil of the Antigua region imparts distinctive mineral characteristics that make this coffee truly unique among Central American offerings.</p>",
+        "description": {
+          "html": [
+            "<p>Our Guatemala Antigua is grown in volcanic soil at high elevations around the historic city of Antigua. The unique terroir of this region, combined with traditional processing methods, creates a coffee with exceptional depth and complexity.</p>",
+            "<p>This medium-dark roast offers a rich, complex flavor profile with notes of cocoa, cinnamon, and orange zest, balanced by a full body and pleasant acidity.</p>",
+            "<p>The volcanic soil of the Antigua region imparts distinctive mineral characteristics that make this coffee truly unique among Central American offerings.</p>"
+          ]
+        },
         "short-description": "Rich and complex with notes of cocoa and spice.",
         "origin": "Guatemala",
         "roast-level": "medium-dark",
         "processing-method": "washed",
         "altitude": "1,500-1,700 meters",
         "tasting-notes": [
-          "Dark chocolate",
-          "Cinnamon",
-          "Orange zest",
-          "Full body",
-          "Smoky finish"
+          { "plainText": ["Dark chocolate"] },
+          { "plainText": ["Cinnamon"] },
+          { "plainText": ["Orange zest"] },
+          { "plainText": ["Full body"] },
+          { "plainText": ["Smoky finish"] }
         ],
         "certifications": ["organic", "shade-grown"],
         "featured": true,
@@ -365,7 +415,7 @@
         "images": [
           {
             "src": "https://images.pexels.com/photos/2262675/pexels-photo-2262675.jpeg",
-            "alt": "Guatemala Antigua coffee beans"
+            "altText": "Guatemala Antigua coffee beans"
           }
         ],
         "seo": {
@@ -381,14 +431,12 @@
             "size": "12oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 17.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 85,
+          "priceVariants": {
+            "usd": 17.99
+          },
+          "stock": {
+            "main-warehouse": 85
+          },
           "weight": 340
         },
         {
@@ -398,14 +446,12 @@
             "size": "12oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 17.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 65,
+          "priceVariants": {
+            "usd": 17.99
+          },
+          "stock": {
+            "main-warehouse": 65
+          },
           "weight": 340
         },
         {
@@ -415,14 +461,12 @@
             "size": "16oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 22.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 70,
+          "priceVariants": {
+            "usd": 22.99
+          },
+          "stock": {
+            "main-warehouse": 70
+          },
           "weight": 454
         },
         {
@@ -432,14 +476,12 @@
             "size": "16oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 22.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 50,
+          "priceVariants": {
+            "usd": 22.99
+          },
+          "stock": {
+            "main-warehouse": 50
+          },
           "weight": 454
         }
       ]
@@ -447,20 +489,29 @@
     {
       "name": "Sumatra Mandheling",
       "shape": "coffee-product",
+      "tree": {
+        "path": "/shop/sumatra-mandheling"
+      },
       "components": {
         "name": "Sumatra Mandheling",
-        "description": "<p>Our Sumatra Mandheling is processed using the traditional wet-hulling method unique to Indonesia, which creates the distinctive earthy, full-bodied character that Sumatran coffees are famous for.</p><p>This dark roast delivers a complex cup with earthy, herbaceous notes, hints of cedar, and a long, smooth finish. The unique processing method and volcanic soil create a coffee unlike any other in the world.</p><p>Perfect for those who enjoy bold, full-bodied coffees with unique flavor characteristics that stand out in both espresso and drip brewing methods.</p>",
+        "description": {
+          "html": [
+            "<p>Our Sumatra Mandheling is processed using the traditional wet-hulling method unique to Indonesia, which creates the distinctive earthy, full-bodied character that Sumatran coffees are famous for.</p>",
+            "<p>This dark roast delivers a complex cup with earthy, herbaceous notes, hints of cedar, and a long, smooth finish. The unique processing method and volcanic soil create a coffee unlike any other in the world.</p>",
+            "<p>Perfect for those who enjoy bold, full-bodied coffees with unique flavor characteristics that stand out in both espresso and drip brewing methods.</p>"
+          ]
+        },
         "short-description": "Bold and earthy with notes of cedar and herbs.",
         "origin": "Indonesia",
         "roast-level": "dark",
         "processing-method": "semi-washed",
         "altitude": "750-1,500 meters",
         "tasting-notes": [
-          "Earthy",
-          "Cedar",
-          "Herbal",
-          "Full body",
-          "Smooth finish"
+          { "plainText": ["Earthy"] },
+          { "plainText": ["Cedar"] },
+          { "plainText": ["Herbal"] },
+          { "plainText": ["Full body"] },
+          { "plainText": ["Smooth finish"] }
         ],
         "certifications": ["organic", "fair-trade"],
         "featured": true,
@@ -468,7 +519,7 @@
         "images": [
           {
             "src": "https://images.pexels.com/photos/2252400/pexels-photo-2252400.jpeg",
-            "alt": "Sumatra Mandheling coffee beans"
+            "altText": "Sumatra Mandheling coffee beans"
           }
         ],
         "seo": {
@@ -484,14 +535,12 @@
             "size": "12oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 18.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 75,
+          "priceVariants": {
+            "usd": 18.99
+          },
+          "stock": {
+            "main-warehouse": 75
+          },
           "weight": 340
         },
         {
@@ -501,14 +550,12 @@
             "size": "12oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 18.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 55,
+          "priceVariants": {
+            "usd": 18.99
+          },
+          "stock": {
+            "main-warehouse": 55
+          },
           "weight": 340
         },
         {
@@ -518,14 +565,12 @@
             "size": "16oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 23.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 60,
+          "priceVariants": {
+            "usd": 23.99
+          },
+          "stock": {
+            "main-warehouse": 60
+          },
           "weight": 454
         },
         {
@@ -535,35 +580,42 @@
             "size": "16oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 23.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 40,
+          "priceVariants": {
+            "usd": 23.99
+          },
+          "stock": {
+            "main-warehouse": 40
+          },
           "weight": 454
         }
       ]
     },
     {
-      "name": "Peru SWP Decaf",
+      "name": "Organic Peru SWP Decaf",
       "shape": "coffee-product",
+      "tree": {
+        "path": "/shop/organic-peru-swp-decaf"
+      },
       "components": {
         "name": "Organic Peru SWP Decaf",
-        "description": "<p>Our Organic Peru SWP Decaf is processed using the Swiss Water Process, a chemical-free decaffeination method that preserves the coffee's natural flavors while removing 99.9% of the caffeine.</p><p>This medium roast maintains the rich, chocolatey characteristics of Peruvian coffee with notes of caramel and nuts, making it perfect for those who want to enjoy great coffee any time of day.</p><p>Sourced from organic farms in the high-altitude regions of Peru, this decaf coffee proves that removing caffeine doesn't mean sacrificing flavor.</p>",
+        "description": {
+          "html": [
+            "<p>Our Organic Peru SWP Decaf is processed using the Swiss Water Process, a chemical-free decaffeination method that preserves the coffee's natural flavors while removing 99.9% of the caffeine.</p>",
+            "<p>This medium roast maintains the rich, chocolatey characteristics of Peruvian coffee with notes of caramel and nuts, making it perfect for those who want to enjoy great coffee any time of day.</p>",
+            "<p>Sourced from organic farms in the high-altitude regions of Peru, this decaf coffee proves that removing caffeine doesn't mean sacrificing flavor.</p>"
+          ]
+        },
         "short-description": "Chemical-free decaf with rich chocolate and caramel notes.",
         "origin": "Peru",
         "roast-level": "medium",
         "processing-method": "washed",
         "altitude": "1,200-1,800 meters",
         "tasting-notes": [
-          "Milk chocolate",
-          "Caramel",
-          "Nuts",
-          "Medium body",
-          "Sweet finish"
+          { "plainText": ["Milk chocolate"] },
+          { "plainText": ["Caramel"] },
+          { "plainText": ["Nuts"] },
+          { "plainText": ["Medium body"] },
+          { "plainText": ["Sweet finish"] }
         ],
         "certifications": ["organic", "fair-trade"],
         "featured": false,
@@ -571,7 +623,7 @@
         "images": [
           {
             "src": "https://images.pexels.com/photos/1695052/pexels-photo-1695052.jpeg",
-            "alt": "Peru SWP Decaf coffee beans"
+            "altText": "Peru SWP Decaf coffee beans"
           }
         ],
         "seo": {
@@ -587,14 +639,12 @@
             "size": "12oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 19.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 50,
+          "priceVariants": {
+            "usd": 19.99
+          },
+          "stock": {
+            "main-warehouse": 50
+          },
           "weight": 340,
           "externalReference": "price_1RKgo2R1hBQXgqR7RYvtL02O"
         },
@@ -605,14 +655,12 @@
             "size": "12oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 19.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 40,
+          "priceVariants": {
+            "usd": 19.99
+          },
+          "stock": {
+            "main-warehouse": 40
+          },
           "weight": 340
         },
         {
@@ -622,14 +670,12 @@
             "size": "16oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 24.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 35,
+          "priceVariants": {
+            "usd": 24.99
+          },
+          "stock": {
+            "main-warehouse": 35
+          },
           "weight": 454
         },
         {
@@ -639,35 +685,42 @@
             "size": "16oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 24.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 25,
+          "priceVariants": {
+            "usd": 24.99
+          },
+          "stock": {
+            "main-warehouse": 25
+          },
           "weight": 454
         }
       ]
     },
     {
-      "name": "House Blend",
+      "name": "Javamate House Blend",
       "shape": "coffee-product",
+      "tree": {
+        "path": "/shop/javamate-house-blend"
+      },
       "components": {
         "name": "Javamate House Blend",
-        "description": "<p>Our signature House Blend combines the best characteristics of Central and South American coffees to create a perfectly balanced, approachable coffee that's perfect for any time of day.</p><p>This medium roast blend features Colombian beans for body and sweetness, Brazilian beans for chocolate notes, and a touch of Guatemalan coffee for complexity and depth.</p><p>Carefully crafted to be versatile across all brewing methods, from espresso to drip coffee, making it the perfect everyday coffee for coffee lovers of all preferences.</p>",
+        "description": {
+          "html": [
+            "<p>Our signature House Blend combines the best characteristics of Central and South American coffees to create a perfectly balanced, approachable coffee that's perfect for any time of day.</p>",
+            "<p>This medium roast blend features Colombian beans for body and sweetness, Brazilian beans for chocolate notes, and a touch of Guatemalan coffee for complexity and depth.</p>",
+            "<p>Carefully crafted to be versatile across all brewing methods, from espresso to drip coffee, making it the perfect everyday coffee for coffee lovers of all preferences.</p>"
+          ]
+        },
         "short-description": "Our signature blend with perfect balance and versatility.",
         "origin": "Blend (Colombia, Brazil, Guatemala)",
         "roast-level": "medium",
         "processing-method": "washed",
         "altitude": "Various",
         "tasting-notes": [
-          "Balanced",
-          "Chocolate",
-          "Caramel",
-          "Medium body",
-          "Clean finish"
+          { "plainText": ["Balanced"] },
+          { "plainText": ["Chocolate"] },
+          { "plainText": ["Caramel"] },
+          { "plainText": ["Medium body"] },
+          { "plainText": ["Clean finish"] }
         ],
         "certifications": ["rainforest-alliance"],
         "featured": true,
@@ -675,7 +728,7 @@
         "images": [
           {
             "src": "https://images.pexels.com/photos/585753/pexels-photo-585753.jpeg",
-            "alt": "Javamate House Blend coffee beans"
+            "altText": "Javamate House Blend coffee beans"
           }
         ],
         "seo": {
@@ -691,14 +744,12 @@
             "size": "12oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 14.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 150,
+          "priceVariants": {
+            "usd": 14.99
+          },
+          "stock": {
+            "main-warehouse": 150
+          },
           "weight": 340
         },
         {
@@ -708,14 +759,12 @@
             "size": "12oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 14.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 120,
+          "priceVariants": {
+            "usd": 14.99
+          },
+          "stock": {
+            "main-warehouse": 120
+          },
           "weight": 340
         },
         {
@@ -725,14 +774,12 @@
             "size": "16oz",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 19.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 100,
+          "priceVariants": {
+            "usd": 19.99
+          },
+          "stock": {
+            "main-warehouse": 100
+          },
           "weight": 454
         },
         {
@@ -742,14 +789,12 @@
             "size": "16oz",
             "grind": "medium"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 19.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 80,
+          "priceVariants": {
+            "usd": 19.99
+          },
+          "stock": {
+            "main-warehouse": 80
+          },
           "weight": 454
         },
         {
@@ -759,147 +804,15 @@
             "size": "2lb",
             "grind": "whole-bean"
           },
-          "priceVariants": [
-            {
-              "identifier": "usd",
-              "price": 34.99,
-              "currency": "USD"
-            }
-          ],
-          "stock": 40,
+          "priceVariants": {
+            "usd": 34.99
+          },
+          "stock": {
+            "main-warehouse": 40
+          },
           "weight": 908
         }
       ]
     }
-  ],
-  "categories": [
-    {
-      "name": "Single Origin",
-      "description": "Coffee from a single geographic region, showcasing unique terroir and flavor characteristics.",
-      "products": [
-        "Ethiopian Yirgacheffe",
-        "Colombian Supremo",
-        "Guatemala Antigua",
-        "Sumatra Mandheling",
-        "Peru SWP Decaf"
-      ]
-    },
-    {
-      "name": "Blends",
-      "description": "Carefully crafted combinations of beans from different regions for balanced, complex flavors.",
-      "products": [
-        "House Blend"
-      ]
-    },
-    {
-      "name": "Decaf",
-      "description": "Premium decaffeinated coffees that maintain full flavor without the caffeine.",
-      "products": [
-        "Peru SWP Decaf"
-      ]
-    },
-    {
-      "name": "Featured",
-      "description": "Our most popular and recommended coffee selections.",
-      "products": [
-        "Ethiopian Yirgacheffe",
-        "Colombian Supremo",
-        "Guatemala Antigua",
-        "Sumatra Mandheling",
-        "House Blend"
-      ]
-    },
-    {
-      "name": "New Arrivals",
-      "description": "Recently added coffees and seasonal offerings.",
-      "products": [
-        "Ethiopian Yirgacheffe",
-        "Peru SWP Decaf"
-      ]
-    }
-  ],
-  "priceBooks": [
-    {
-      "identifier": "usd-retail",
-      "name": "USD Retail Prices",
-      "currency": "USD"
-    }
-  ],
-  "vatTypes": [
-    {
-      "name": "Standard",
-      "percent": 0
-    }
-  ],
-  "stockLocations": [
-    {
-      "identifier": "main-warehouse",
-      "name": "Main Warehouse",
-      "settings": {
-        "minimum": 10,
-        "maximum": 1000
-      }
-    }
-  ],
-  "subscriptionPlans": [
-    {
-      "identifier": "monthly-coffee",
-      "name": "Monthly Coffee Subscription",
-      "periods": [
-        {
-          "name": "Monthly",
-          "initial": {
-            "period": 1,
-            "unit": "month"
-          },
-          "recurring": {
-            "period": 1,
-            "unit": "month"
-          }
-        }
-      ]
-    },
-    {
-      "identifier": "bi-weekly-coffee",
-      "name": "Bi-Weekly Coffee Subscription",
-      "periods": [
-        {
-          "name": "Bi-Weekly",
-          "initial": {
-            "period": 2,
-            "unit": "week"
-          },
-          "recurring": {
-            "period": 2,
-            "unit": "week"
-          }
-        }
-      ]
-    }
-  ],
-  "importInstructions": {
-    "steps": [
-      "1. Log into your Crystallize tenant dashboard",
-      "2. Navigate to Settings > Shapes and create the 'coffee-product' shape using the specifications above",
-      "3. Go to Catalogue and create the category structure",
-      "4. Import products one by one using the product data provided",
-      "5. For each product, create variants using the variant specifications with proper priceVariants structure",
-      "6. Set up price books and assign prices to variants",
-      "7. Configure stock locations and assign inventory",
-      "8. Set up subscription plans if offering recurring deliveries",
-      "9. Configure Stripe integration and map price IDs to variants using externalReference field",
-      "10. Test the integration with your application"
-    ],
-    "notes": [
-      "Variants use 'attributes' for size and grind properties, not separate component fields",
-      "Pricing is handled through 'priceVariants' array with identifier, price, and currency",
-      "Stripe price IDs should be stored in the 'externalReference' field for variants",
-      "Upload product images to Crystallize media library before assigning to products",
-      "Configure SEO components for better search engine optimization",
-      "Set up proper URL patterns for product pages",
-      "Configure webhooks for real-time inventory updates",
-      "Test all variants have proper pricing and stock levels",
-      "Verify Stripe price IDs are correctly mapped for payment processing"
-    ]
-  }
+  ]
 }
